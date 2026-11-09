@@ -688,7 +688,7 @@ function icon(name, cls='i'){ return `<svg class="${cls}" viewBox="0 0 24 24" fi
    Every rule and condition note carries src: [source keys] -> SOURCES.
    "general" = common pharmacist guidance still awaiting a specific citation.
    ===================================================================== */
-const DB_META = { version:'2026.11-draft3c', compiled:'2026-11-08', status:'Draft — compiled from FDA labels and NIH fact sheets; not yet reviewed by a pharmacist' };
+const DB_META = { version:'2026.11-draft4', compiled:'2026-11-08', status:'Draft — compiled from FDA labels and NIH fact sheets; not yet reviewed by a pharmacist' };
 
 const TYPES = {medication:'Medication', vitamin:'Vitamin / mineral', supplement:'Supplement', food:'Food & drink'};
 const FOOD = {E:'Empty stomach', W:'With food', F:'With a meal that has some fat', A:'With or without food'};
@@ -729,6 +729,14 @@ const SOURCES = {
   'lbl-ibuprofen':L('Ibuprofen (OTC Drug Facts)','ibuprofen'),
   'lbl-acetaminophen':L('Acetaminophen (OTC Drug Facts)','acetaminophen'),
   'lbl-metformin':L('Metformin','metformin'),
+  'lbl-ozempic':L('Semaglutide injection (Ozempic, Wegovy)','semaglutide'),
+  'lbl-rybelsus':{org:'FDA drug label', title:'Rybelsus (semaglutide tablets) prescribing information, 2025', url:'https://www.accessdata.fda.gov/drugsatfda_docs/label/2025/213051s024%2Cs028s029lbl.pdf'},
+  'lbl-mounjaro':L('Tirzepatide (Mounjaro, Zepbound)','tirzepatide'),
+  'lbl-liraglutide':L('Liraglutide (Victoza, Saxenda)','liraglutide'),
+  'lbl-trulicity':L('Dulaglutide (Trulicity)','dulaglutide'),
+  'lbl-glipizide':L('Glipizide (Glucotrol)','glipizide'),
+  'lbl-insulin':L('Insulin glargine (Lantus)','insulin glargine'),
+  'asa-glp1-2024':{org:'ASA, AGA, ASMBS, ISPCOP & SAGES (2024)', title:'Multisociety guidance on GLP-1 receptor agonists before surgery and endoscopy', url:'https://asahq.org/about-asa/newsroom/news-releases/2024/10/new-multi-society-glp-1-guidance'},
   'lbl-lisinopril':L('Lisinopril','lisinopril'),
   'lbl-spironolactone':L('Spironolactone','spironolactone'),
   'lbl-hctz':L('Hydrochlorothiazide','hydrochlorothiazide'),
@@ -817,6 +825,13 @@ const ITEMS = [
   I('acetaminophen',"Acetaminophen (Tylenol)",'medication',['tylenol','paracetamol','pain reliever'],['acetaminophen'],['breakfast','lunch','dinner'],'A',"Check cold/flu combination products so you don't double up. The label lists your daily maximum.",{defaultFreq:'prn',src:['lbl-acetaminophen']}),
   I('prednisone',"Prednisone & oral steroids",'medication',['prednisolone','methylprednisolone','medrol','dexamethasone','steroid','corticosteroid'],['corticosteroid'],['breakfast'],'W',"Take in the morning with food — later doses can cause insomnia and stomach upset.",{src:['lbl-prednisone']}),
   I('metformin',"Metformin (Glucophage)",'medication',['glucophage','glumetza','fortamet','diabetes'],['metformin'],['dinner','breakfast'],'W',"Take with meals to reduce stomach upset. Extended-release versions are usually taken with the evening meal.",{src:['lbl-metformin']}),
+  I('semaglutide',"Semaglutide injection (Ozempic, Wegovy)",'medication',['ozempic','wegovy','semaglutide','glp-1','glp1','weight loss shot','weight loss injection','diabetes'],['glp1'],['breakfast'],'A',"Once a week on the same day, any time of day, with or without food. If you need to change your injection day, ask your pharmacist how. GLP-1 drugs slow how fast the stomach empties, so nausea, fullness and constipation are common at first and after each dose increase. Smaller meals help.",{defaultFreq:'weekly',src:['lbl-ozempic']}),
+  I('semaglutide-oral',"Semaglutide tablet (Rybelsus, Wegovy pill)",'medication',['rybelsus','wegovy pill','oral semaglutide','oral wegovy','semaglutide tablet','glp-1 pill','glp1 pill','diabetes'],['glp1','glp1-oral'],['wake'],'E',"First thing in the morning on an empty stomach, with no more than 4 oz (half a cup) of plain water. Then wait at least 30 minutes before any food, drink, or other pills — waiting less makes it work less well. Swallow whole. GLP-1 drugs slow how fast the stomach empties, so nausea, fullness and constipation are common at first and after each dose increase. Smaller meals help.",{fixed:true,src:['lbl-rybelsus']}),
+  I('tirzepatide',"Tirzepatide (Mounjaro, Zepbound)",'medication',['mounjaro','zepbound','tirzepatide','glp-1','glp1','gip','weight loss shot','weight loss injection','diabetes'],['glp1','tirzepatide'],['breakfast'],'A',"Once a week on the same day, any time of day, with or without food. Acts on both GLP-1 and GIP receptors. GLP-1 drugs slow how fast the stomach empties, so nausea, fullness and constipation are common at first and after each dose increase. Smaller meals help.",{defaultFreq:'weekly',src:['lbl-mounjaro']}),
+  I('liraglutide',"Liraglutide (Victoza, Saxenda)",'medication',['victoza','saxenda','liraglutide','glp-1','glp1','diabetes'],['glp1'],['breakfast'],'A',"Once a day, any time, with or without food — try to keep it around the same time each day. GLP-1 drugs slow how fast the stomach empties, so nausea, fullness and constipation are common at first and after each dose increase. Smaller meals help.",{src:['lbl-liraglutide']}),
+  I('dulaglutide',"Dulaglutide (Trulicity)",'medication',['trulicity','dulaglutide','glp-1','glp1','diabetes'],['glp1'],['breakfast'],'A',"Once a week on the same day, any time of day, with or without food. GLP-1 drugs slow how fast the stomach empties, so nausea, fullness and constipation are common at first and after each dose increase. Smaller meals help.",{defaultFreq:'weekly',src:['lbl-trulicity']}),
+  I('insulin',"Insulin (Lantus, Basaglar, Tresiba, Humalog, Novolog…)",'medication',['lantus','basaglar','toujeo','semglee','tresiba','levemir','humalog','novolog','admelog','fiasp','lyumjev','humulin','novolin','insulin glargine','insulin lispro','insulin aspart','long-acting insulin','basal insulin','mealtime insulin','diabetes'],['insulin','diabetes-med'],['bedtime','breakfast','dinner'],'A',"Timing depends on the type. Long-acting (basal) insulin is usually once a day at the same time; mealtime insulin is taken with meals. Follow your prescriber's plan — set a fixed time here if you have one.",{src:['lbl-insulin']}),
+  I('sulfonylurea',"Sulfonylureas (glipizide, glimepiride, glyburide)",'medication',['glipizide','glucotrol','glimepiride','amaryl','glyburide','glynase','micronase','diabeta','sulfonylurea','diabetes'],['sulfonylurea','diabetes-med'],['breakfast','dinner'],'W',"Usually with breakfast; immediate-release glipizide is taken about 30 minutes before a meal. Don't skip meals while taking it — that can cause low blood sugar.",{src:['lbl-glipizide']}),
   I('lisinopril',"Lisinopril & other ACE inhibitors",'medication',['zestril','prinivil','enalapril','benazepril','ramipril','ace inhibitor','blood pressure'],['raises-potassium','raas','lowers-bp'],['breakfast'],'A',"Once daily at the same time each day.",{src:['lbl-lisinopril']}),
   I('losartan',"Losartan & other ARBs (Cozaar, Diovan)",'medication',['cozaar','valsartan','diovan','olmesartan','irbesartan','arb','blood pressure'],['raises-potassium','raas','lowers-bp'],['breakfast'],'A',"Once daily at the same time each day."),
   I('spironolactone',"Spironolactone (Aldactone)",'medication',['aldactone','water pill'],['raises-potassium','lowers-bp'],['breakfast'],'W',"Usually taken in the morning with food.",{src:['lbl-spironolactone']}),
@@ -1028,6 +1043,18 @@ const RULES = [
   R('carnitine','anticoagulant','caution',null,"In case reports, L-carnitine raised INR in people taking a warfarin-like blood thinner. It's unclear whether acetyl-L-carnitine does the same. Tell your anticoagulation clinic before starting.",['bachmann-2004','general'],'limited'),
   R('carnitine','thyroid-hormone','caution',null,"L-carnitine may block thyroid hormone from entering cells; it has been studied to ease an overactive thyroid. It might make thyroid medication less effective — ask your clinician.",['general'],'limited'),
   R('valproate','carnitine','info',null,"Valproate can lower your body's carnitine levels, and doctors sometimes prescribe carnitine for that. Don't start it on your own; ask your prescriber.",['ods-carnitine']),
+  R('glp1-oral','type:medication','separate',{aFirst:0.5,bFirst:0},"Take the semaglutide tablet first, then wait at least 30 minutes before other pills. Taking them together makes the tablet work less well.",['lbl-rybelsus'],'established',{generic:true}),
+  R('glp1-oral','type:vitamin','separate',{aFirst:0.5,bFirst:0},"Wait at least 30 minutes after the semaglutide tablet before vitamins or minerals.",['lbl-rybelsus'],'established',{generic:true}),
+  R('glp1-oral','type:supplement','separate',{aFirst:0.5,bFirst:0},"Wait at least 30 minutes after the semaglutide tablet before supplements.",['lbl-rybelsus'],'established',{generic:true}),
+  R('glp1-oral','type:food','separate',{aFirst:0.5,bFirst:0},"Wait at least 30 minutes after the semaglutide tablet before any food or drink other than a little plain water.",['lbl-rybelsus'],'established',{generic:true}),
+  R('glp1-oral','thyroid-hormone','caution',null,"Both need an empty stomach first thing, so they can't go down together. The semaglutide tablet also raised levothyroxine levels by about 33% in a study, so your prescriber may check your thyroid levels. The labels don't say which comes first — a common plan is the semaglutide tablet on waking, levothyroxine 30 minutes later, then breakfast 30–60 minutes after that, or levothyroxine at bedtime. Ask your prescriber or pharmacist which they want.",['lbl-rybelsus','lbl-levothyroxine']),
+  R('glp1-oral','bisphosphonate','caution',null,"Both must be taken alone, first thing, with plain water. Ask your pharmacist how to order them on the days you take both.",['lbl-rybelsus','lbl-alendronate']),
+  R('glp1','insulin','caution',null,"Together they raise the risk of low blood sugar. Your prescriber may lower your insulin dose when starting a GLP-1 — check your glucose more often, especially at first.",['lbl-ozempic','lbl-mounjaro']),
+  R('glp1','sulfonylurea','caution',null,"Together they raise the risk of low blood sugar. Your prescriber may lower the sulfonylurea dose — know the signs (shaky, sweaty, confused) and keep fast sugar on hand.",['lbl-ozempic','lbl-mounjaro']),
+  R('tirzepatide','hormonal-contraceptive','caution',null,"Tirzepatide can make birth control pills less effective. The label says to switch to a non-pill method or add a barrier method (like condoms) for 4 weeks after starting and for 4 weeks after each dose increase.",['lbl-mounjaro']),
+  R('glp1','warfarin','caution',null,"GLP-1 drugs slow stomach emptying, which can change how pills like warfarin are absorbed. The labels advise closer monitoring for drugs like this — expect more frequent INR checks when starting or changing the dose.",['lbl-rybelsus','lbl-ozempic'],'limited'),
+  R('lowers-glucose','glp1','caution',null,"This supplement may lower blood sugar. Along with a GLP-1 drug, check your glucose more often.",['nccih-fenugreek','nccih-ginseng','medlineplus-arginine'],'limited'),
+  R('lowers-glucose','diabetes-med','caution',null,"This supplement may lower blood sugar. With insulin or a sulfonylurea, it could drop too low — check your glucose more often.",['nccih-fenugreek','nccih-ginseng','medlineplus-arginine']),
   R('nmn','niacin','info',null,"Both are forms of vitamin B3. Amounts from several B3 products add up, so check totals — especially if you also take high-dose niacin.",['ods-niacin','general'],'limited'),
   R('lipoic-acid','thyroid-hormone','caution',null,"Alpha-lipoic acid may lower thyroid hormone levels or reduce how well thyroid medication works. Your clinician may want to recheck your levels.",['general'],'limited'),
   R('horny-goat-weed','pde5','caution',null,"Icariin acts on the same pathway as ED medications in lab studies. The combination hasn't been studied in people.",['general'],'limited')
@@ -1037,6 +1064,7 @@ const RULES = [
 const CONDITIONS = [
   {id:'pregnancy', name:"Pregnant or trying to conceive", c:[
     ['isotretinoin','avoid',"Isotretinoin causes severe birth defects and is contraindicated in pregnancy.",['lbl-isotretinoin']],
+    ['glp1','caution',"Tell your prescriber. Semaglutide should be stopped at least 2 months before a planned pregnancy because it stays in the body a long time; weight-loss versions are stopped once pregnancy is confirmed.",['lbl-ozempic','lbl-rybelsus','lbl-mounjaro']],
     ['nmn','caution',"NMN hasn't been studied in pregnancy or breastfeeding. Ask your OB before taking it.",['wen-2024-nmn']],
     ['vitamin-a','caution',"High-dose preformed vitamin A (retinol) can cause birth defects. Prenatal vitamins limit it — avoid extra vitamin A unless prescribed.",['ods-vitaminA']],
     ['sjw','avoid',"Not recommended in pregnancy; safety hasn't been established.",['nccih-sjw']],
@@ -1060,6 +1088,7 @@ const CONDITIONS = [
     ['potassium','avoid',"Kidneys clear excess potassium. Don't take potassium unless your nephrologist prescribed it.",['ods-potassium']],
     ['magnesium','caution',"Magnesium can build up when kidney function is reduced.",['ods-magnesium']],
     ['nsaid','avoid',"NSAIDs can worsen kidney function. Ask about alternatives.",['lbl-ibuprofen']],
+    ['glp1','caution',"Vomiting or diarrhea from a GLP-1 drug can dehydrate you and worsen kidney function. Drink fluids and call your doctor if you can't keep them down.",['lbl-ozempic','lbl-mounjaro']],
     ['lithium','caution',"Lithium is cleared by the kidneys; dosing needs close monitoring.",['lbl-lithium']],
     ['yohimbe','avoid',"Yohimbe has been linked to kidney failure, and people with kidney problems are advised not to use it.",['medlineplus-yohimbe']],
     ['licorice','caution',"Licorice has been linked to serious effects in people with kidney conditions.",['nccih-licorice']],
@@ -1118,6 +1147,7 @@ const CONDITIONS = [
   {id:'bleeding', name:"Bleeding disorder or upcoming surgery", c:[
     ['bleeding-risk','caution',"May increase bleeding. Surgeons often ask you to stop these 1–2 weeks before a procedure — follow your surgeon's instructions.",['ods-omega3','ods-vitaminE','nccih-ginkgo']],
     ['nsaid','caution',"NSAIDs affect platelets and increase bleeding risk.",['lbl-ibuprofen']],
+    ['glp1','info',"GLP-1 drugs slow stomach emptying, which matters for anesthesia. Most people can keep taking them, but tell your surgical team — you may be asked to follow a liquid-only diet for 24 hours before the procedure.",['asa-glp1-2024']],
     ['arginine','caution',"L-arginine may interfere with blood pressure control around surgery; stop it at least 2 weeks before.",['medlineplus-arginine']],
     ['lipoic-acid','caution',"Alpha-lipoic acid can affect blood sugar around surgery; it's often stopped 2 weeks before.",['general']],
     ['blood-thinner','info',"Your care team will tell you if and when to pause a blood thinner before a procedure — don't stop on your own.",['lbl-warfarin','lbl-apixaban']]
@@ -1144,7 +1174,8 @@ const CONDITIONS = [
     ['valproate','caution',"Valproate carries a boxed warning for liver failure; it's generally avoided with significant liver disease.",['lbl-valproate']]
   ]},
   {id:'gallbladder', name:"Gallstones / gallbladder disease", c:[
-    ['turmeric','caution',"Turmeric may worsen gallbladder problems.",['nccih-turmeric']]
+    ['turmeric','caution',"Turmeric may worsen gallbladder problems.",['nccih-turmeric']],
+    ['glp1','caution',"GLP-1 drugs have been linked to gallstones and gallbladder inflammation. Tell your prescriber about your history.",['lbl-ozempic','lbl-mounjaro']],
   ]},
   {id:'bipolar', name:"Bipolar disorder", c:[
     ['sjw','avoid',"St. John's wort can trigger mania.",['nccih-sjw']],
@@ -1160,10 +1191,25 @@ const CONDITIONS = [
     ['fenugreek','caution',"Fenugreek acted like estrogen on breast cancer cells in lab studies. Check with your oncologist.",['mskcc-fenugreek']],
     ['hormonal-supp','caution',"Products marketed to change hormone levels haven't been studied in people with hormone-sensitive cancers. Ask your oncologist first."]
   ]},
+  {id:'mtc-men2', name:"Medullary thyroid cancer or MEN 2 (you or family)", c:[
+    ['glp1','avoid',"GLP-1 drugs carry a boxed warning for thyroid C-cell tumors and must not be used with a personal or family history of medullary thyroid cancer or MEN 2.",['lbl-ozempic','lbl-mounjaro','lbl-rybelsus']]
+  ]},
+  {id:'pancreatitis', name:"Pancreatitis (past or current)", c:[
+    ['glp1','caution',"GLP-1 drugs have been linked to pancreatitis. Stop and get care right away for severe stomach pain that may spread to your back.",['lbl-ozempic','lbl-mounjaro']]
+  ]},
+  {id:'gastroparesis', name:"Gastroparesis or severe GI disease", c:[
+    ['glp1','caution',"GLP-1 drugs slow stomach emptying further and aren't recommended with severe gastroparesis.",['lbl-ozempic','lbl-mounjaro']]
+  ]},
+  {id:'retinopathy', name:"Diabetic eye disease (retinopathy)", c:[
+    ['semaglutide','caution',"Semaglutide was linked to worsening diabetic retinopathy in a trial, mostly when blood sugar dropped fast. Keep up with eye exams.",['lbl-ozempic']],
+    ['semaglutide-oral','caution',"Semaglutide was linked to worsening diabetic retinopathy in a trial, mostly when blood sugar dropped fast. Keep up with eye exams.",['lbl-rybelsus']]
+  ]},
   {id:'older-adult', name:"Age 65 or older", c:[
     ['first-gen-antihistamine','caution',"The AGS Beers Criteria lists diphenhydramine and similar antihistamines as best avoided in older adults (confusion, falls, constipation).",['beers']],
     ['nsaid','caution',"The Beers Criteria advises avoiding long-term NSAID use in older adults unless other options fail (stomach bleeding, kidney risk).",['beers']],
     ['sedating','info',"Sedating products raise fall risk in older adults — combine carefully.",['beers']]
+    ,['sulfonylurea','caution',"The Beers Criteria advises against sulfonylureas for most older adults because of low-blood-sugar risk; if one is needed, short-acting glipizide is preferred over glyburide or glimepiride.",['beers']],
+    ['insulin','info',"Low blood sugar is more dangerous in older adults (falls, confusion). Ask whether your glucose targets should be relaxed.",['beers']]
   ]}
 ];
 
@@ -1209,6 +1255,14 @@ const FORMS = {
     {name:'Vitamin K1 (phylloquinone)', aka:'leafy greens, most multivitamins', absorb:'Well absorbed; clears from blood within hours', food:'With a meal that has some fat', src:['schurgers-2007','ods-vitaminK']},
     {name:'Vitamin K2 — MK-7', aka:'menaquinone-7, natto-derived', absorb:'Very long half-life: steadier blood levels, building to 7–8× higher than K1 with daily use', food:'With a meal that has some fat', good:'In one study, 50 mcg/day or more could interfere with warfarin.', src:['schurgers-2007']},
     {name:'Vitamin K2 — MK-4', aka:'menatetrenone', absorb:'Short half-life', food:'With a meal that has some fat', good:'Used at high doses in some Japanese osteoporosis studies.', src:['ods-vitaminK']}
+  ]},
+  semaglutide:{title:'GLP-1 medications compared', intro:'All of these mimic GLP-1, a gut hormone that lowers blood sugar and appetite. Brand names differ by dose and approved use, not by ingredient.', src:['lbl-ozempic','lbl-rybelsus','lbl-mounjaro','lbl-liraglutide','lbl-trulicity'], forms:[
+    {name:'Ozempic (semaglutide)', aka:'weekly pen', amount:'0.25 mg → up to 2 mg once a week', food:'Any time, with or without food', good:'Type 2 diabetes; also lowers heart and kidney risk in type 2 diabetes.', src:['lbl-ozempic']},
+    {name:'Wegovy (semaglutide)', aka:'weekly pen or daily pill', amount:'Up to 2.4 mg weekly injection, or 25 mg daily pill', food:'Pill: empty stomach, 30 min before anything else', good:'Weight management; same ingredient as Ozempic at a higher dose.', src:['lbl-ozempic','lbl-rybelsus']},
+    {name:'Rybelsus (semaglutide)', aka:'daily pill', amount:'Small daily doses (much higher than the injection, because little is absorbed)', food:'Empty stomach, ≤4 oz water, wait 30 min', stomach:'Strict morning routine', good:'Type 2 diabetes for people who prefer a pill.', src:['lbl-rybelsus']},
+    {name:'Mounjaro / Zepbound (tirzepatide)', aka:'weekly pen', amount:'2.5 mg → up to 15 mg once a week', food:'Any time, with or without food', good:'Acts on GLP-1 and GIP. Mounjaro for diabetes, Zepbound for weight and sleep apnea. Can weaken birth control pills.', src:['lbl-mounjaro']},
+    {name:'Trulicity (dulaglutide)', aka:'weekly pen', food:'Any time, with or without food', good:'Type 2 diabetes; lowers heart risk.', src:['lbl-trulicity']},
+    {name:'Victoza / Saxenda (liraglutide)', aka:'daily pen', food:'Any time, with or without food', good:'Older daily option. Victoza for diabetes, Saxenda for weight.', src:['lbl-liraglutide']}
   ]},
   nmn:{title:'NAD+ precursors (vitamin B3 forms)', intro:'All of these can be turned into NAD+, a molecule cells use to make energy. They differ in how they are studied and in side effects.', src:['ods-niacin','wen-2024-nmn','chen-2024-nmn'], forms:[
     {name:'NMN (nicotinamide mononucleotide)', aka:'β-NMN, Uthever', source:'Supplement; small amounts in foods like edamame and broccoli', absorb:'Raises blood NAD+ in short trials', active:'One step from NAD+', good:'Well tolerated in trials up to about 12 weeks. No clear effect on blood sugar or cholesterol so far.', src:['wen-2024-nmn','chen-2024-nmn']},
@@ -1269,6 +1323,13 @@ const USES = {
   isotretinoin:{rx:['Severe nodular acne']},
   alendronate:{rx:['Osteoporosis','Paget’s disease of bone']},
   'oral-contraceptive':{rx:['Preventing pregnancy'], off:'Some brands are also approved for acne or PMDD.'},
+  semaglutide:{rx:['Type 2 diabetes (Ozempic)','Chronic weight management (Wegovy)','Lowering heart attack & stroke risk','Kidney disease with type 2 diabetes (Ozempic)']},
+  'semaglutide-oral':{rx:['Type 2 diabetes (Rybelsus)','Chronic weight management (Wegovy pill)','Lowering heart attack & stroke risk']},
+  tirzepatide:{rx:['Type 2 diabetes (Mounjaro)','Chronic weight management (Zepbound)','Obstructive sleep apnea with obesity (Zepbound)']},
+  liraglutide:{rx:['Type 2 diabetes (Victoza)','Chronic weight management (Saxenda)','Lowering heart attack & stroke risk in type 2 diabetes (Victoza)']},
+  dulaglutide:{rx:['Type 2 diabetes','Lowering heart attack & stroke risk in type 2 diabetes']},
+  insulin:{rx:['Type 1 diabetes','Type 2 diabetes']},
+  sulfonylurea:{rx:['Type 2 diabetes']},
   tums:{rx:['Heartburn & acid indigestion','Calcium supplement']},
   diphenhydramine:{rx:['Allergies & hay fever','Occasional sleeplessness']},
   pde5:{rx:['Erectile dysfunction','Enlarged prostate / BPH (tadalafil)','Pulmonary arterial hypertension (Revatio, Adcirca)']},
