@@ -688,7 +688,7 @@ function icon(name, cls='i'){ return `<svg class="${cls}" viewBox="0 0 24 24" fi
    Every rule and condition note carries src: [source keys] -> SOURCES.
    "general" = common pharmacist guidance still awaiting a specific citation.
    ===================================================================== */
-const DB_META = { version:'2026.11-draft4', compiled:'2026-11-08', status:'Draft — compiled from FDA labels and NIH fact sheets; not yet reviewed by a pharmacist' };
+const DB_META = { version:'2026.11-draft4b', compiled:'2026-11-08', status:'Draft — compiled from FDA labels and NIH fact sheets; not yet reviewed by a pharmacist' };
 
 const TYPES = {medication:'Medication', vitamin:'Vitamin / mineral', supplement:'Supplement', food:'Food & drink'};
 const FOOD = {E:'Empty stomach', W:'With food', F:'With a meal that has some fat', A:'With or without food'};
@@ -737,6 +737,12 @@ const SOURCES = {
   'lbl-glipizide':L('Glipizide (Glucotrol)','glipizide'),
   'lbl-insulin':L('Insulin glargine (Lantus)','insulin glargine'),
   'asa-glp1-2024':{org:'ASA, AGA, ASMBS, ISPCOP & SAGES (2024)', title:'Multisociety guidance on GLP-1 receptor agonists before surgery and endoscopy', url:'https://asahq.org/about-asa/newsroom/news-releases/2024/10/new-multi-society-glp-1-guidance'},
+  'lbl-jardiance':L('Empagliflozin (Jardiance)','empagliflozin'),
+  'lbl-farxiga':L('Dapagliflozin (Farxiga)','dapagliflozin'),
+  'fda-sglt2-surgery':{org:'FDA (2020)', title:'Label changes for SGLT2 inhibitors: stop before scheduled surgery (3 days; ertugliflozin 4 days)', url:null},
+  'lbl-januvia':L('Sitagliptin (Januvia)','sitagliptin'),
+  'lbl-saxagliptin':L('Saxagliptin (Onglyza) and alogliptin (Nesina)','saxagliptin'),
+  'ada-soc':{org:'American Diabetes Association', title:'Standards of Care in Diabetes — Pharmacologic approaches to glycemic treatment', url:null},
   'lbl-lisinopril':L('Lisinopril','lisinopril'),
   'lbl-spironolactone':L('Spironolactone','spironolactone'),
   'lbl-hctz':L('Hydrochlorothiazide','hydrochlorothiazide'),
@@ -832,6 +838,8 @@ const ITEMS = [
   I('dulaglutide',"Dulaglutide (Trulicity)",'medication',['trulicity','dulaglutide','glp-1','glp1','diabetes'],['glp1'],['breakfast'],'A',"Once a week on the same day, any time of day, with or without food. GLP-1 drugs slow how fast the stomach empties, so nausea, fullness and constipation are common at first and after each dose increase. Smaller meals help.",{defaultFreq:'weekly',src:['lbl-trulicity']}),
   I('insulin',"Insulin (Lantus, Basaglar, Tresiba, Humalog, Novolog…)",'medication',['lantus','basaglar','toujeo','semglee','tresiba','levemir','humalog','novolog','admelog','fiasp','lyumjev','humulin','novolin','insulin glargine','insulin lispro','insulin aspart','long-acting insulin','basal insulin','mealtime insulin','diabetes'],['insulin','diabetes-med'],['bedtime','breakfast','dinner'],'A',"Timing depends on the type. Long-acting (basal) insulin is usually once a day at the same time; mealtime insulin is taken with meals. Follow your prescriber's plan — set a fixed time here if you have one.",{src:['lbl-insulin']}),
   I('sulfonylurea',"Sulfonylureas (glipizide, glimepiride, glyburide)",'medication',['glipizide','glucotrol','glimepiride','amaryl','glyburide','glynase','micronase','diabeta','sulfonylurea','diabetes'],['sulfonylurea','diabetes-med'],['breakfast','dinner'],'W',"Usually with breakfast; immediate-release glipizide is taken about 30 minutes before a meal. Don't skip meals while taking it — that can cause low blood sugar.",{src:['lbl-glipizide']}),
+  I('sglt2',"SGLT2 inhibitors (Jardiance, Farxiga, Invokana, Steglatro)",'medication',['jardiance','farxiga','invokana','steglatro','empagliflozin','dapagliflozin','canagliflozin','ertugliflozin','synjardy','xigduo','invokamet','segluromet','glyxambi','qtern','trijardy','sglt2','sglt-2','diabetes','heart failure'],['sglt2'],['breakfast','wake'],'A',"Once a day in the morning, with or without food (Invokana before the first meal). It works by passing extra sugar out in your urine, so drink enough fluids. Watch for genital yeast infections, UTIs, and signs of ketoacidosis (nausea, vomiting, belly pain, unusual tiredness, trouble breathing) — even when blood sugar looks normal.",{src:['lbl-jardiance','lbl-farxiga']}),
+  I('dpp4',"DPP-4 inhibitors (Januvia, Tradjenta, Onglyza, Nesina)",'medication',['januvia','tradjenta','onglyza','nesina','sitagliptin','linagliptin','saxagliptin','alogliptin','janumet','jentadueto','kombiglyze','kazano','dpp-4','dpp4','gliptin','diabetes'],['dpp4'],['breakfast'],'A',"Once a day, with or without food. Usually gentle on its own, but rarely linked to pancreatitis, joint pain, and skin blistering.",{src:['lbl-januvia']}),
   I('lisinopril',"Lisinopril & other ACE inhibitors",'medication',['zestril','prinivil','enalapril','benazepril','ramipril','ace inhibitor','blood pressure'],['raises-potassium','raas','lowers-bp'],['breakfast'],'A',"Once daily at the same time each day.",{src:['lbl-lisinopril']}),
   I('losartan',"Losartan & other ARBs (Cozaar, Diovan)",'medication',['cozaar','valsartan','diovan','olmesartan','irbesartan','arb','blood pressure'],['raises-potassium','raas','lowers-bp'],['breakfast'],'A',"Once daily at the same time each day."),
   I('spironolactone',"Spironolactone (Aldactone)",'medication',['aldactone','water pill'],['raises-potassium','lowers-bp'],['breakfast'],'W',"Usually taken in the morning with food.",{src:['lbl-spironolactone']}),
@@ -1055,6 +1063,14 @@ const RULES = [
   R('glp1','warfarin','caution',null,"GLP-1 drugs slow stomach emptying, which can change how pills like warfarin are absorbed. The labels advise closer monitoring for drugs like this — expect more frequent INR checks when starting or changing the dose.",['lbl-rybelsus','lbl-ozempic'],'limited'),
   R('lowers-glucose','glp1','caution',null,"This supplement may lower blood sugar. Along with a GLP-1 drug, check your glucose more often.",['nccih-fenugreek','nccih-ginseng','medlineplus-arginine'],'limited'),
   R('lowers-glucose','diabetes-med','caution',null,"This supplement may lower blood sugar. With insulin or a sulfonylurea, it could drop too low — check your glucose more often.",['nccih-fenugreek','nccih-ginseng','medlineplus-arginine']),
+  R('sglt2','insulin','caution',null,"Together they raise the risk of low blood sugar. Your prescriber may lower your insulin dose.",['lbl-jardiance']),
+  R('sglt2','sulfonylurea','caution',null,"Together they raise the risk of low blood sugar. Your prescriber may lower the sulfonylurea dose.",['lbl-jardiance']),
+  R('sglt2','thiazide','caution',null,"Both make you lose fluid. Together they can cause dehydration, dizziness, or low blood pressure — especially in older adults. Drink fluids and stand up slowly.",['lbl-jardiance']),
+  R('sglt2','lithium','caution',null,"SGLT2 inhibitors can lower lithium levels. Expect more frequent lithium blood tests when starting or changing the dose.",['lbl-jardiance']),
+  R('sglt2','alcohol','caution',null,"Heavy drinking raises the risk of ketoacidosis with SGLT2 inhibitors.",['lbl-jardiance']),
+  R('dpp4','glp1','caution',null,"DPP-4 inhibitors and GLP-1 drugs work on the same pathway, and diabetes guidelines don't recommend using them together — little added benefit. Ask your prescriber whether you still need both.",['ada-soc']),
+  R('dpp4','insulin','caution',null,"Together they raise the risk of low blood sugar. Your prescriber may lower your insulin dose.",['lbl-januvia']),
+  R('dpp4','sulfonylurea','caution',null,"Together they raise the risk of low blood sugar. Your prescriber may lower the sulfonylurea dose.",['lbl-januvia']),
   R('nmn','niacin','info',null,"Both are forms of vitamin B3. Amounts from several B3 products add up, so check totals — especially if you also take high-dose niacin.",['ods-niacin','general'],'limited'),
   R('lipoic-acid','thyroid-hormone','caution',null,"Alpha-lipoic acid may lower thyroid hormone levels or reduce how well thyroid medication works. Your clinician may want to recheck your levels.",['general'],'limited'),
   R('horny-goat-weed','pde5','caution',null,"Icariin acts on the same pathway as ED medications in lab studies. The combination hasn't been studied in people.",['general'],'limited')
@@ -1065,6 +1081,7 @@ const CONDITIONS = [
   {id:'pregnancy', name:"Pregnant or trying to conceive", c:[
     ['isotretinoin','avoid',"Isotretinoin causes severe birth defects and is contraindicated in pregnancy.",['lbl-isotretinoin']],
     ['glp1','caution',"Tell your prescriber. Semaglutide should be stopped at least 2 months before a planned pregnancy because it stays in the body a long time; weight-loss versions are stopped once pregnancy is confirmed.",['lbl-ozempic','lbl-rybelsus','lbl-mounjaro']],
+    ['sglt2','caution',"SGLT2 inhibitors aren't recommended in the second and third trimesters or while breastfeeding. Talk to your prescriber.",['lbl-jardiance']],
     ['nmn','caution',"NMN hasn't been studied in pregnancy or breastfeeding. Ask your OB before taking it.",['wen-2024-nmn']],
     ['vitamin-a','caution',"High-dose preformed vitamin A (retinol) can cause birth defects. Prenatal vitamins limit it — avoid extra vitamin A unless prescribed.",['ods-vitaminA']],
     ['sjw','avoid',"Not recommended in pregnancy; safety hasn't been established.",['nccih-sjw']],
@@ -1089,6 +1106,8 @@ const CONDITIONS = [
     ['magnesium','caution',"Magnesium can build up when kidney function is reduced.",['ods-magnesium']],
     ['nsaid','avoid',"NSAIDs can worsen kidney function. Ask about alternatives.",['lbl-ibuprofen']],
     ['glp1','caution',"Vomiting or diarrhea from a GLP-1 drug can dehydrate you and worsen kidney function. Drink fluids and call your doctor if you can't keep them down.",['lbl-ozempic','lbl-mounjaro']],
+    ['sglt2','info',"Jardiance and Farxiga are also used to protect the kidneys, but they aren't for people on dialysis, and whether they fit depends on your kidney function. Your prescriber will check it regularly.",['lbl-jardiance','lbl-farxiga']],
+    ['dpp4','info',"Most DPP-4 inhibitors need a lower dose with reduced kidney function (linagliptin/Tradjenta is the exception).",['lbl-januvia']],
     ['lithium','caution',"Lithium is cleared by the kidneys; dosing needs close monitoring.",['lbl-lithium']],
     ['yohimbe','avoid',"Yohimbe has been linked to kidney failure, and people with kidney problems are advised not to use it.",['medlineplus-yohimbe']],
     ['licorice','caution',"Licorice has been linked to serious effects in people with kidney conditions.",['nccih-licorice']],
@@ -1106,6 +1125,7 @@ const CONDITIONS = [
     ['bupropion','caution',"Bupropion can raise blood pressure in some people.",['lbl-bupropion']]
   ]},
   {id:'heart', name:"Heart disease or arrhythmia", c:[
+    ['dpp4','caution',"Saxagliptin (Onglyza) and alogliptin (Nesina) have been linked to hospitalization for heart failure. Ask whether another option fits better.",['lbl-saxagliptin']],
     ['licorice','avoid',"Glycyrrhizin can cause irregular heartbeat, especially in people with heart conditions.",['nccih-licorice']],
     ['yohimbe','avoid',"Yohimbine has been linked to irregular heartbeat and heart attacks.",['nccih-yohimbe']],
     ['pde5','caution',"Check with your cardiologist that your heart is healthy enough for sexual activity and ED medication.",['lbl-sildenafil']],
@@ -1148,6 +1168,7 @@ const CONDITIONS = [
     ['bleeding-risk','caution',"May increase bleeding. Surgeons often ask you to stop these 1–2 weeks before a procedure — follow your surgeon's instructions.",['ods-omega3','ods-vitaminE','nccih-ginkgo']],
     ['nsaid','caution',"NSAIDs affect platelets and increase bleeding risk.",['lbl-ibuprofen']],
     ['glp1','info',"GLP-1 drugs slow stomach emptying, which matters for anesthesia. Most people can keep taking them, but tell your surgical team — you may be asked to follow a liquid-only diet for 24 hours before the procedure.",['asa-glp1-2024']],
+    ['sglt2','caution',"The FDA label says to stop SGLT2 inhibitors at least 3 days before scheduled surgery (Steglatro: 4 days) because of ketoacidosis risk. Ask your surgeon and prescriber for your exact plan.",['fda-sglt2-surgery']],
     ['arginine','caution',"L-arginine may interfere with blood pressure control around surgery; stop it at least 2 weeks before.",['medlineplus-arginine']],
     ['lipoic-acid','caution',"Alpha-lipoic acid can affect blood sugar around surgery; it's often stopped 2 weeks before.",['general']],
     ['blood-thinner','info',"Your care team will tell you if and when to pause a blood thinner before a procedure — don't stop on your own.",['lbl-warfarin','lbl-apixaban']]
@@ -1195,7 +1216,8 @@ const CONDITIONS = [
     ['glp1','avoid',"GLP-1 drugs carry a boxed warning for thyroid C-cell tumors and must not be used with a personal or family history of medullary thyroid cancer or MEN 2.",['lbl-ozempic','lbl-mounjaro','lbl-rybelsus']]
   ]},
   {id:'pancreatitis', name:"Pancreatitis (past or current)", c:[
-    ['glp1','caution',"GLP-1 drugs have been linked to pancreatitis. Stop and get care right away for severe stomach pain that may spread to your back.",['lbl-ozempic','lbl-mounjaro']]
+    ['glp1','caution',"GLP-1 drugs have been linked to pancreatitis. Stop and get care right away for severe stomach pain that may spread to your back.",['lbl-ozempic','lbl-mounjaro']],
+    ['dpp4','caution',"DPP-4 inhibitors have been linked to pancreatitis. Tell your prescriber about your history.",['lbl-januvia']],
   ]},
   {id:'gastroparesis', name:"Gastroparesis or severe GI disease", c:[
     ['glp1','caution',"GLP-1 drugs slow stomach emptying further and aren't recommended with severe gastroparesis.",['lbl-ozempic','lbl-mounjaro']]
@@ -1204,12 +1226,16 @@ const CONDITIONS = [
     ['semaglutide','caution',"Semaglutide was linked to worsening diabetic retinopathy in a trial, mostly when blood sugar dropped fast. Keep up with eye exams.",['lbl-ozempic']],
     ['semaglutide-oral','caution',"Semaglutide was linked to worsening diabetic retinopathy in a trial, mostly when blood sugar dropped fast. Keep up with eye exams.",['lbl-rybelsus']]
   ]},
+  {id:'uti', name:"Frequent UTIs or yeast infections", c:[
+    ['sglt2','caution',"SGLT2 inhibitors pass sugar into the urine, which raises the risk of genital yeast infections and UTIs — more so if you've had them before. Good hygiene and fluids help; get symptoms checked promptly.",['lbl-jardiance']]
+  ]},
   {id:'older-adult', name:"Age 65 or older", c:[
     ['first-gen-antihistamine','caution',"The AGS Beers Criteria lists diphenhydramine and similar antihistamines as best avoided in older adults (confusion, falls, constipation).",['beers']],
     ['nsaid','caution',"The Beers Criteria advises avoiding long-term NSAID use in older adults unless other options fail (stomach bleeding, kidney risk).",['beers']],
     ['sedating','info',"Sedating products raise fall risk in older adults — combine carefully.",['beers']]
     ,['sulfonylurea','caution',"The Beers Criteria advises against sulfonylureas for most older adults because of low-blood-sugar risk; if one is needed, short-acting glipizide is preferred over glyburide or glimepiride.",['beers']],
     ['insulin','info',"Low blood sugar is more dangerous in older adults (falls, confusion). Ask whether your glucose targets should be relaxed.",['beers']]
+    ,['sglt2','caution',"Dehydration and urinary infections were more common in people 75 and older taking SGLT2 inhibitors. Drink fluids, and call your doctor if you're vomiting or can't eat.",['lbl-jardiance','beers']]
   ]}
 ];
 
@@ -1330,6 +1356,8 @@ const USES = {
   dulaglutide:{rx:['Type 2 diabetes','Lowering heart attack & stroke risk in type 2 diabetes']},
   insulin:{rx:['Type 1 diabetes','Type 2 diabetes']},
   sulfonylurea:{rx:['Type 2 diabetes']},
+  sglt2:{rx:['Type 2 diabetes','Heart failure (Jardiance, Farxiga)','Chronic kidney disease (Jardiance, Farxiga)','Lowering heart-related death in type 2 diabetes with heart disease']},
+  dpp4:{rx:['Type 2 diabetes']},
   tums:{rx:['Heartburn & acid indigestion','Calcium supplement']},
   diphenhydramine:{rx:['Allergies & hay fever','Occasional sleeplessness']},
   pde5:{rx:['Erectile dysfunction','Enlarged prostate / BPH (tadalafil)','Pulmonary arterial hypertension (Revatio, Adcirca)']},
@@ -1491,6 +1519,8 @@ const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const short = item => item.name.replace(/\s*\(.*\)\s*/,'').trim();
 function allItems(){ return ITEMS.concat(state.customItems); }
 function getItem(id){ return allItems().find(i=>i.id===id); }
+// lowercase a condition name for mid-sentence use, but keep acronyms (UTIs, MEN 2, GERD)
+function condLower(n){ return n.split(' ').map(w=>/[A-Z].*[A-Z]/.test(w)?w:w.toLowerCase()).join(' '); }
 function matches(item, sel){ return sel.startsWith('type:') ? item.type===sel.slice(5) : (item.id===sel || item.tags.includes(sel)); }
 function toMin(t){ const p=String(t||'').split(':'); const h=parseInt(p[0],10), m=parseInt(p[1],10); return (isNaN(h)?0:h)*60+(isNaN(m)?0:m); }
 function fmt(min){ min=((min%1440)+1440)%1440; let h=Math.floor(min/60); const m=min%60, ap=h>=12?'PM':'AM'; h=h%12||12; return h+':'+String(m).padStart(2,'0')+' '+ap; }
@@ -1721,7 +1751,7 @@ function computeFindings(entries, placed){
     for(const x of entries){
       let best=null;
       for(const [sel,sev,note,src] of c.c) if(matches(x.item,sel) && (!best || SEVRANK[sev]<SEVRANK[best.sev])) best={sev,note,src:src||['general']};
-      if(best) F.push({sev:best.sev, cond:c.name, uids:[x.e.uid], title:`${short(x.item)} with ${c.name.toLowerCase()}`, note:best.note, src:best.src});
+      if(best) F.push({sev:best.sev, cond:c.name, uids:[x.e.uid], title:`${short(x.item)} with ${condLower(c.name)}`, note:best.note, src:best.src});
     }
   }
   const bed = toMin(P().bedtime);
@@ -2168,7 +2198,7 @@ function quickCheck(item){
     const c = CONDITIONS.find(k=>k.id===cid); if(!c) continue;
     let best=null;
     for(const [sel,sev,note,src] of c.c) if(matches(item,sel) && (!best || SEVRANK[sev]<SEVRANK[best.sev])) best={sev,note,src:src||['general']};
-    if(best) out.push({sev:best.sev, title:`${short(item)} with ${c.name.toLowerCase()}`, note:best.note, src:best.src});
+    if(best) out.push({sev:best.sev, title:`${short(item)} with ${condLower(c.name)}`, note:best.note, src:best.src});
   }
   return out.sort((a,b)=>SEVRANK[a.sev]-SEVRANK[b.sev]);
 }
