@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F6F1E4">
 <title>VitRx — Medication &amp; Supplement Scheduler</title>
 <meta name="description" content="Build a daily schedule for your medications, vitamins and supplements, with interaction and timing checks.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232E6A4E'/%3E%3Cpath d='M10 22c0-7 5-12 13-12 0 8-5 13-12 13' fill='none' stroke='%23F6F1E4' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -16,6 +17,7 @@
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 h1,h2,h3{font-family:var(--serif);color:var(--green-d);font-weight:600;letter-spacing:-.01em;line-height:1.2;margin:0 0 .5rem}
 h2{font-size:1.45rem} h3{font-size:1.15rem}
@@ -164,7 +166,8 @@ dialog.wide{max-width:1040px}
 main{padding-top:20px;padding-bottom:48px}
 .grid{display:grid;grid-template-columns:1.45fr 1fr;gap:22px;align-items:start}
 @media (max-width:880px){.grid{grid-template-columns:1fr}}
-.col{display:grid;gap:22px}
+.col{display:grid;gap:22px;min-width:0}
+.col>*{min-width:0}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
 .card-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
 .opt{font-family:system-ui,sans-serif;font-size:.8rem;font-weight:500;color:var(--muted);background:var(--sage);border-radius:999px;padding:2px 9px;vertical-align:middle}
@@ -202,9 +205,9 @@ main{padding-top:20px;padding-bottom:48px}
 .chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer;font-size:.92rem;font-weight:550;color:var(--ink);min-height:36px}
 .chip:hover{border-color:var(--green)}
 .chip[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}
-.results{list-style:none;margin:14px 0 6px;padding:0;display:grid;gap:8px}
+.results{list-style:none;margin:14px 0 6px;padding:0;display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
 .result{display:flex;align-items:center;gap:12px;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff}
-.result .meta{min-width:0}
+.result .meta{min-width:0;flex:1}
 .result .name{font-weight:600;display:block}
 .result .aka{font-size:.85rem;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .result .btns{display:flex;gap:6px;flex:none}
@@ -347,6 +350,51 @@ details.saved .body{padding:0 16px 16px;border-top:1px solid var(--line)}
 .snap li{padding:4px 0;border-bottom:1px dashed var(--line)}
 .snap b{color:var(--green-d)}
 
+
+/* ---------- phones ---------- */
+.tab-ic{display:none}
+@media (max-width:640px){
+  body{font-size:16px;padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+  input,select,textarea{font-size:16px!important}
+  .wrap{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}
+  header.site{position:static}
+  .head{padding-top:12px;padding-bottom:12px;gap:10px}
+  .brand{gap:10px}
+  .brand-mark{width:34px;height:34px;border-radius:10px}
+  .brand-name{font-size:1.35rem}
+  .brand-sub{font-size:.78rem}
+  .gs-box input{padding:9px 0}
+  .gs-panel{position:fixed;left:10px;right:10px;top:auto;bottom:calc(76px + env(safe-area-inset-bottom));max-height:calc(100vh - 220px)}
+  /* bottom tab bar */
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:28;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;border-radius:0;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -4px 18px rgba(29,58,46,.08);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+  .tabs button{position:relative;flex-direction:column;justify-content:center;gap:2px;padding:6px 2px;border-radius:12px;font-size:.7rem;font-weight:600;min-height:52px;color:var(--muted)}
+  .tabs button[aria-selected="true"]{background:var(--sage);box-shadow:none;color:var(--green-d)}
+  .tab-ic{display:block;line-height:0}
+  .tabs .tab-ic svg{width:22px;height:22px}
+  .tabs .count{position:absolute;top:3px;left:calc(50% + 5px);font-size:.62rem;padding:0 5px;line-height:1.5}
+  /* floating stack button + panel sit above the tab bar */
+  .stack{right:12px;bottom:calc(74px + env(safe-area-inset-bottom))}
+  .stack-fab{min-height:48px}
+  .stack-panel{width:calc(100vw - 24px)}
+  .stack-list{max-height:34vh}
+  .cmp-tray{bottom:calc(134px + env(safe-area-inset-bottom))}
+  /* cards & lists */
+  main{padding-top:18px}
+  .card{padding:16px;border-radius:14px}
+  .grid,.col{gap:16px}
+  .disclaimer{font-size:.85rem;margin-top:12px}
+  .result{flex-wrap:wrap;gap:8px}
+  .result .meta{flex-basis:100%}
+  .result .btns{width:100%;justify-content:flex-end;align-items:center}
+  .result .btns .watch-icon{margin-right:auto}
+  .btn,.icon-btn{min-height:40px}
+  /* dialogs become bottom sheets */
+  html dialog,html dialog.wide{width:100%;max-width:none;margin:auto 0 0;border-radius:18px 18px 0 0;max-height:92vh}
+  html .dlg-head{padding:16px 16px 0}
+  html .dlg-body{padding:10px 16px calc(18px + env(safe-area-inset-bottom));max-height:calc(92vh - 70px)}
+  footer{padding-bottom:20px}
+}
+
 /* dialog */
 dialog{border:0;border-radius:18px;padding:0;max-width:640px;width:calc(100% - 32px);background:var(--surface);color:var(--ink);box-shadow:0 20px 50px rgba(29,58,46,.25)}
 dialog::backdrop{background:rgba(29,58,46,.35)}
@@ -400,11 +448,11 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
       <div class="gs-panel" id="gs-panel" hidden></div>
     </div>
     <nav class="tabs" role="tablist" aria-label="Sections">
-      <button role="tab" id="tab-routine" aria-controls="panel-routine" data-action="tab" data-tab="routine">My routine</button>
-      <button role="tab" id="tab-schedule" aria-controls="panel-schedule" data-action="tab" data-tab="schedule">Schedule <span id="tab-count" class="count" hidden></span></button>
-      <button role="tab" id="tab-library" aria-controls="panel-library" data-action="tab" data-tab="library">Library</button>
-      <button role="tab" id="tab-watchlist" aria-controls="panel-watchlist" data-action="tab" data-tab="watchlist">Watchlist <span id="watch-count" class="count count-soft" hidden></span></button>
-      <button role="tab" id="tab-saved" aria-controls="panel-saved" data-action="tab" data-tab="saved">Saved <span id="saved-count" class="count count-soft" hidden></span></button>
+      <button role="tab" id="tab-routine" aria-controls="panel-routine" data-action="tab" data-tab="routine"><span class="tab-ic" aria-hidden="true"><span data-icon="pill"></span></span><span class="tab-lbl">My routine</span></button>
+      <button role="tab" id="tab-schedule" aria-controls="panel-schedule" data-action="tab" data-tab="schedule"><span class="tab-ic" aria-hidden="true"><span data-icon="calendar"></span></span><span class="tab-lbl">Schedule</span> <span id="tab-count" class="count" hidden></span></button>
+      <button role="tab" id="tab-library" aria-controls="panel-library" data-action="tab" data-tab="library"><span class="tab-ic" aria-hidden="true"><span data-icon="book"></span></span><span class="tab-lbl">Library</span></button>
+      <button role="tab" id="tab-watchlist" aria-controls="panel-watchlist" data-action="tab" data-tab="watchlist"><span class="tab-ic" aria-hidden="true"><span data-icon="bookmark"></span></span><span class="tab-lbl">Watchlist</span> <span id="watch-count" class="count count-soft" hidden></span></button>
+      <button role="tab" id="tab-saved" aria-controls="panel-saved" data-action="tab" data-tab="saved"><span class="tab-ic" aria-hidden="true"><span data-icon="save"></span></span><span class="tab-lbl">Saved</span> <span id="saved-count" class="count count-soft" hidden></span></button>
     </nav>
   </div>
 </header>
@@ -607,6 +655,8 @@ const ICON_PATHS = {
   bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',
   calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
   utensils:'<path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M17 21V3c-2 0-3.5 2.5-3.5 6v4H17"/>',
+  book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"/><path d="M4 19a2 2 0 0 1 2-2h13"/>',
+  bookmark:'<path d="M6 3h12v18l-6-4-6 4z"/>',
   apple:'<path d="M12 7.5c-2-1.6-6.5-1.2-6.5 4 0 4.2 3.2 9 6.5 9s6.5-4.8 6.5-9c0-5.2-4.5-5.6-6.5-4z"/><path d="M12 7.5c0-2.2 1-3.8 3-4.5"/>'
 };
 function icon(name, cls='i'){ return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name]||''}</svg>`; }
