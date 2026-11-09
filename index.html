@@ -6,7 +6,14 @@
 <meta name="theme-color" content="#F6F1E4">
 <title>VitRx — Medication &amp; Supplement Scheduler</title>
 <meta name="description" content="Build a daily schedule for your medications, vitamins and supplements, with interaction and timing checks.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232E6A4E'/%3E%3Cpath d='M10 22c0-7 5-12 13-12 0 8-5 13-12 13' fill='none' stroke='%23F6F1E4' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="VitRx">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 :root{
   --bg:#F6F1E4; --surface:#FFFDF7; --ink:#1D3A2E; --green:#2E6A4E; --green-d:#1F4D38;
@@ -351,6 +358,14 @@ details.saved .body{padding:0 16px 16px;border-top:1px solid var(--line)}
 .snap b{color:var(--green-d)}
 
 
+.install-card{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--rust);border-radius:12px;padding:10px 12px;margin:12px 0 0}
+.install-icon img{display:block;border-radius:10px}
+.install-txt{flex:1;min-width:0;font-size:.9rem;display:grid;gap:2px}
+.install-txt b{color:var(--green-d)}
+.install-txt span{color:var(--muted)}
+.install-btns{display:flex;align-items:center;gap:4px;flex:none}
+.ios-share svg{vertical-align:-.25em;color:var(--green)}
+@media (display-mode: standalone){ header.site{padding-top:env(safe-area-inset-top)} }
 /* ---------- phones ---------- */
 .tab-ic{display:none}
 @media (max-width:640px){
@@ -462,6 +477,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
     <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
     <span><strong>For education, not medical advice.</strong> VitRx uses a small, curated starter database and can't know everything about you or your prescriptions. Check any change with your pharmacist or prescriber, and never stop or re-time a prescribed medication on your own.</span>
   </p>
+  <div id="install-card" class="install-card" role="region" aria-label="Install app" hidden></div>
   <p id="storage-note" class="storage-note" role="status" hidden>Your browser isn't allowing local storage, so changes won't be saved after you close this page.</p>
 </div>
 
@@ -655,6 +671,7 @@ const ICON_PATHS = {
   bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',
   calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
   utensils:'<path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M17 21V3c-2 0-3.5 2.5-3.5 6v4H17"/>',
+  share:'<path d="M12 3v12"/><path d="m8 7 4-4 4 4"/><path d="M6 11H5v10h14V11h-1"/>',
   book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"/><path d="M4 19a2 2 0 0 1 2-2h13"/>',
   bookmark:'<path d="M6 3h12v18l-6-4-6 4z"/>',
   apple:'<path d="M12 7.5c-2-1.6-6.5-1.2-6.5 4 0 4.2 3.2 9 6.5 9s6.5-4.8 6.5-9c0-5.2-4.5-5.6-6.5-4z"/><path d="M12 7.5c0-2.2 1-3.8 3-4.5"/>'
@@ -1997,11 +2014,12 @@ function notify(title, lines){
   const t=$('#toast');
   t.innerHTML = `<h4>${icon('bell')} ${esc(title)}</h4><ul>${lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul><button class="btn btn-small btn-primary" data-action="dismiss-toast">Got it</button>`;
   t.hidden = false;
-  try{
-    if('Notification' in window && Notification.permission==='granted'){
-      new Notification(title, {body: lines.join('\n'), tag:'vitrx-'+title});
-    }
-  }catch(e){ /* some mobile browsers only allow notifications from an installed app */ }
+  if(!('Notification' in window) || Notification.permission!=='granted') return;
+  const opts = {body: lines.join('\n'), tag:'vitrx-'+title, icon:'icons/icon-192.png', badge:'icons/icon-192.png'};
+  // Phones (and installed apps) only allow notifications through the service worker
+  const viaSW = () => navigator.serviceWorker.ready.then(r=>r.showNotification(title, opts));
+  if('serviceWorker' in navigator && navigator.serviceWorker.controller){ viaSW().catch(()=>{ try{ new Notification(title, opts); }catch(e){} }); return; }
+  try{ new Notification(title, opts); }catch(e){ if('serviceWorker' in navigator) viaSW().catch(()=>{}); }
 }
 function reminderTick(){
   if(!state.reminders || !state.reminders.on) return;
@@ -2773,6 +2791,31 @@ renderTimes();
 renderConditions();
 $('#storage-note').hidden = storageOK;
 refresh();
+
+/* ---------- install as an app (PWA) ---------- */
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+  window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+}
+let installEvt = null;
+const isStandalone = () => (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+function renderInstall(){
+  const el = document.getElementById('install-card'); if(!el) return;
+  let dismissed = false; try{ dismissed = localStorage.getItem('vitrx-install-dismissed')==='1'; }catch(e){}
+  if(isStandalone() || dismissed || !(installEvt || isIOS())){ el.hidden = true; return; }
+  el.hidden = false;
+  el.innerHTML = `<div class="install-icon"><img src="icons/icon-192.png" alt="" width="40" height="40"></div>
+    <div class="install-txt"><b>Add VitRx to your home screen</b><span>${installEvt ? 'Opens like an app, works offline, and makes reminders more reliable.' : 'Tap the Share button <span class="ios-share" aria-label="Share">'+icon('share')+'</span> in Safari, then <b>Add to Home Screen</b>.'}</span></div>
+    <div class="install-btns">${installEvt?'<button class="btn btn-small btn-primary" data-action="install-app">Install</button>':''}<button class="icon-btn" data-action="install-dismiss" aria-label="Dismiss">${icon('x')}</button></div>`;
+}
+window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); installEvt = e; renderInstall(); });
+window.addEventListener('appinstalled', ()=>{ installEvt = null; renderInstall(); });
+document.addEventListener('click', e=>{
+  const t = e.target.closest('[data-action="install-app"],[data-action="install-dismiss"]'); if(!t) return;
+  if(t.dataset.action==='install-app' && installEvt){ installEvt.prompt(); installEvt.userChoice.finally(()=>{ installEvt=null; renderInstall(); }); }
+  else { try{ localStorage.setItem('vitrx-install-dismissed','1'); }catch(err){} renderInstall(); }
+});
+renderInstall();
 </script>
 </body>
 </html>
