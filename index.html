@@ -366,6 +366,14 @@ details.saved .body{padding:0 16px 16px;border-top:1px solid var(--line)}
 .install-btns{display:flex;align-items:center;gap:4px;flex:none}
 .ios-share svg{vertical-align:-.25em;color:var(--green)}
 @media (display-mode: standalone){ header.site{padding-top:env(safe-area-inset-top)} }
+.hp{position:absolute!important;left:-9999px;width:1px;height:1px;overflow:hidden}
+#feedback-form textarea{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:8px 10px;background:#fff;font:inherit;resize:vertical;min-height:110px}
+#feedback-form textarea:focus{border-color:var(--green);outline:none;box-shadow:0 0 0 3px rgba(46,106,78,.15)}
+.fb-item{margin:0;font-weight:600;color:var(--green-d)}
+.fb-privacy{background:var(--sage);border-radius:10px;padding:8px 10px;margin:0}
+.fb-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#fb-msg-status.is-ok{color:var(--green-d);font-weight:600}
+#fb-msg-status.is-err{color:var(--rust-d);font-weight:600}
 /* ---------- phones ---------- */
 .tab-ic{display:none}
 @media (max-width:640px){
@@ -572,6 +580,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
 
 <footer>
   <div class="wrap">
+    <p class="fb-foot"><button class="btn btn-small" data-action="feedback-open"><span data-icon="chat"></span>Send feedback</button> Spotted something wrong, or want something added? Tell us.</p>
     <p><strong>About the data.</strong> Every interaction and condition note links to its source — FDA drug labels (DailyMed), NIH Office of Dietary Supplements and NCCIH fact sheets, or FDA safety communications. Notes marked “limited evidence” are precautionary; notes marked “citation still needed” are common pharmacist guidance awaiting a specific reference. See Library → Sources &amp; review status. Not every interaction is listed — an empty result does not mean a combination is safe.</p>
   </div>
 </footer>
@@ -637,6 +646,38 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
   </div>
 </dialog>
 
+<!-- Netlify reads this hidden copy at deploy time to set up the "feedback" form -->
+<form name="feedback" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input name="bot-field"><input name="kind"><textarea name="message"></textarea><input name="email"><input name="item"><input name="stack"><input name="context">
+</form>
+
+<dialog id="feedback-dialog" aria-labelledby="feedback-title">
+  <div class="dlg-head">
+    <h2 id="feedback-title">Send feedback</h2>
+    <button class="icon-btn" data-action="close-dialog" aria-label="Close"><span data-icon="x"></span></button>
+  </div>
+  <div class="dlg-body">
+    <form id="feedback-form" class="form-grid" novalidate>
+      <p class="hp" aria-hidden="true"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+      <div class="field"><label for="fb-kind">What's this about?</label>
+        <select id="fb-kind" name="kind">
+          <option value="info">Wrong or missing interaction info</option>
+          <option value="bug">Something isn't working</option>
+          <option value="idea">Idea or request</option>
+          <option value="add">Add an item to the database</option>
+          <option value="other">Other</option>
+        </select></div>
+      <div class="field" id="fb-item-row" hidden><label>About</label><p id="fb-item-name" class="fb-item"></p></div>
+      <div class="field"><label for="fb-msg">Your feedback</label><textarea id="fb-msg" name="message" required maxlength="3000" rows="5" placeholder="What happened, or what would you like to see?"></textarea></div>
+      <div class="field"><label for="fb-email">Email (optional — only if you'd like a reply)</label><input id="fb-email" name="email" type="email" maxlength="120" autocomplete="email"></div>
+      <label class="check"><input type="checkbox" id="fb-stack"> Include the list of items I've added (helps us check an interaction)</label>
+      <p class="small muted fb-privacy">Only what you type here is sent — plus the app version and whether you're on a phone or computer. Your medications aren't included unless you tick the box above, and even then only item names (no doses, times, or health conditions). Please don't include personal health details.</p>
+      <button class="btn btn-primary" type="submit" id="fb-send"><span data-icon="send"></span>Send feedback</button>
+      <p id="fb-msg-status" class="small" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</dialog>
+
 <div id="toast" class="toast" role="alert" hidden></div>
 <input type="file" id="import-file" accept="application/json,.json" hidden>
 
@@ -671,6 +712,8 @@ const ICON_PATHS = {
   bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',
   calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
   utensils:'<path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M17 21V3c-2 0-3.5 2.5-3.5 6v4H17"/>',
+  send:'<path d="m4 12 16-8-6 16-3-7z"/><path d="m11 13 9-9"/>',
+  chat:'<path d="M4 5h16v11H9l-5 4z"/>',
   share:'<path d="M12 3v12"/><path d="m8 7 4-4 4 4"/><path d="M6 11H5v10h14V11h-1"/>',
   book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"/><path d="M4 19a2 2 0 0 1 2-2h13"/>',
   bookmark:'<path d="M6 3h12v18l-6-4-6 4z"/>',
@@ -688,7 +731,7 @@ function icon(name, cls='i'){ return `<svg class="${cls}" viewBox="0 0 24 24" fi
    Every rule and condition note carries src: [source keys] -> SOURCES.
    "general" = common pharmacist guidance still awaiting a specific citation.
    ===================================================================== */
-const DB_META = { version:'2026.11-draft4b', compiled:'2026-11-08', status:'Draft — compiled from FDA labels and NIH fact sheets; not yet reviewed by a pharmacist' };
+const DB_META = { version:'2026.11-draft4c', compiled:'2026-11-08', status:'Draft — compiled from FDA labels and NIH fact sheets; not yet reviewed by a pharmacist' };
 
 const TYPES = {medication:'Medication', vitamin:'Vitamin / mineral', supplement:'Supplement', food:'Food & drink'};
 const FOOD = {E:'Empty stomach', W:'With food', F:'With a meal that has some fat', A:'With or without food'};
@@ -743,6 +786,9 @@ const SOURCES = {
   'lbl-januvia':L('Sitagliptin (Januvia)','sitagliptin'),
   'lbl-saxagliptin':L('Saxagliptin (Onglyza) and alogliptin (Nesina)','saxagliptin'),
   'ada-soc':{org:'American Diabetes Association', title:'Standards of Care in Diabetes — Pharmacologic approaches to glycemic treatment', url:null},
+  'lbl-furosemide':L('Furosemide (Lasix)','furosemide'),
+  'lbl-digoxin':L('Digoxin (Lanoxin)','digoxin'),
+  'lbl-invokana':L('Canagliflozin (Invokana)','canagliflozin'),
   'lbl-lisinopril':L('Lisinopril','lisinopril'),
   'lbl-spironolactone':L('Spironolactone','spironolactone'),
   'lbl-hctz':L('Hydrochlorothiazide','hydrochlorothiazide'),
@@ -844,6 +890,8 @@ const ITEMS = [
   I('losartan',"Losartan & other ARBs (Cozaar, Diovan)",'medication',['cozaar','valsartan','diovan','olmesartan','irbesartan','arb','blood pressure'],['raises-potassium','raas','lowers-bp'],['breakfast'],'A',"Once daily at the same time each day."),
   I('spironolactone',"Spironolactone (Aldactone)",'medication',['aldactone','water pill'],['raises-potassium','lowers-bp'],['breakfast'],'W',"Usually taken in the morning with food.",{src:['lbl-spironolactone']}),
   I('hctz',"Hydrochlorothiazide & thiazide diuretics",'medication',['hctz','microzide','chlorthalidone','indapamide','water pill','blood pressure'],['thiazide','lowers-potassium','lowers-bp'],['breakfast'],'A',"Take in the morning so nighttime bathroom trips don't disrupt sleep.",{src:['lbl-hctz']}),
+  I('furosemide',"Loop diuretics (furosemide/Lasix, bumetanide, torsemide)",'medication',['lasix','furosemide','bumetanide','bumex','torsemide','demadex','soaanz','loop diuretic','water pill','fluid pill','edema','swelling','heart failure'],['loop-diuretic','lowers-potassium','lowers-bp'],['breakfast','wake'],'A',"Usually in the morning so you're not up at night to urinate. If you take it twice a day, take the second dose by mid-afternoon. If your doctor asked you to, weigh yourself every morning — a quick gain can mean fluid is building up.",{bid2:['lunch'],src:['lbl-furosemide']}),
+  I('digoxin',"Digoxin (Lanoxin)",'medication',['lanoxin','digitek','digox','digitalis','heart failure','atrial fibrillation','afib'],['digoxin'],['breakfast'],'A',"Once a day at the same time, with or without food. Keep it at least 2 hours apart from high-fiber meals and fiber supplements. Signs of too much digoxin: nausea, loss of appetite, confusion, blurry or yellow-green vision, or a slow or irregular heartbeat — call your doctor.",{src:['lbl-digoxin']}),
   I('atorvastatin',"Atorvastatin (Lipitor)",'medication',['lipitor','statin','cholesterol'],['statin'],['dinner','breakfast'],'A',"Can be taken any time of day — pick a consistent time.",{src:['lbl-atorvastatin']}),
   I('simvastatin',"Simvastatin (Zocor)",'medication',['zocor','statin','cholesterol'],['statin'],['dinner','bedtime'],'A',"Usually taken in the evening.",{src:['lbl-simvastatin']}),
   I('ppi',"Omeprazole / esomeprazole (Prilosec, Nexium)",'medication',['omeprazole','prilosec','esomeprazole','nexium','ppi','acid reflux','heartburn'],['acid-reducer','omeprazole'],['wake','breakfast'],'E',"Works best 30–60 minutes before breakfast.",{src:['lbl-omeprazole']}),
@@ -989,7 +1037,7 @@ const RULES = [
   R('lithium','caffeine','info',null,"Big changes in how much caffeine you drink can shift lithium levels. Keep intake steady and tell your prescriber about changes.",['general'],'limited'),
   R('thiazide','calcium','caution',null,"Thiazide diuretics reduce how much calcium your kidneys get rid of. Adding calcium supplements can raise blood calcium in some people.",['lbl-hctz']),
   R('thiazide','vitamin-d','info',null,"Thiazides plus vitamin D can raise blood calcium slightly. Truly high calcium was uncommon in a study, but it's worth checking on routine labs.",['ods-vitaminD','chandler-2014'],'limited'),
-  R('licorice','lowers-potassium','caution',null,"Licorice and thiazide diuretics both lower potassium — together they could drop it too low.",['nccih-licorice']),
+  R('licorice','lowers-potassium','caution',null,"Licorice and water pills (thiazide or loop diuretics) both lower potassium — together they could drop it too low.",['nccih-licorice']),
   R('licorice','corticosteroid','caution',null,"Interactions between licorice and corticosteroids such as prednisone have been reported.",['nccih-licorice'],'limited'),
   // Statins
   R('simvastatin','grapefruit','avoid',null,"Grapefruit juice can greatly raise simvastatin levels and the risk of muscle damage. The label advises avoiding it.",['lbl-simvastatin']),
@@ -1071,6 +1119,17 @@ const RULES = [
   R('dpp4','glp1','caution',null,"DPP-4 inhibitors and GLP-1 drugs work on the same pathway, and diabetes guidelines don't recommend using them together — little added benefit. Ask your prescriber whether you still need both.",['ada-soc']),
   R('dpp4','insulin','caution',null,"Together they raise the risk of low blood sugar. Your prescriber may lower your insulin dose.",['lbl-januvia']),
   R('dpp4','sulfonylurea','caution',null,"Together they raise the risk of low blood sugar. Your prescriber may lower the sulfonylurea dose.",['lbl-januvia']),
+  R('loop-diuretic','lithium','caution',null,"Diuretics slow how the kidneys clear lithium and can push it to toxic levels. The furosemide label says the two generally shouldn't be combined — if they are, expect close lithium monitoring.",['lbl-furosemide','lbl-lithium']),
+  R('loop-diuretic','nsaid','caution',null,"NSAIDs can weaken the water pill's effect, and together they strain the kidneys — especially in older adults or with heart failure. Ask before using Advil or Aleve regularly.",['lbl-furosemide','lbl-ibuprofen']),
+  R('loop-diuretic','sglt2','caution',null,"Both make you lose fluid. Together they can cause dehydration, dizziness, or low blood pressure — your prescriber may adjust the diuretic dose.",['lbl-jardiance']),
+  R('loop-diuretic','thiazide','caution',null,"Sometimes prescribed together on purpose, but the combination can drop potassium, sodium, and fluid quickly. Expect more frequent blood tests.",['lbl-furosemide','lbl-hctz']),
+  R('digoxin','lowers-potassium','caution',null,"Water pills can lower potassium and magnesium, which makes digoxin side effects and heart-rhythm problems more likely. Your doctor will check your levels.",['lbl-digoxin']),
+  R('digoxin','fiber','separate',2,"Fiber supplements and high-bran meals can reduce how much digoxin you absorb. Keep them at least 2 hours apart.",['lbl-digoxin']),
+  R('digoxin','antacid','separate',2,"Antacids can reduce how much digoxin you absorb. Keep them at least 2 hours apart.",['lbl-digoxin']),
+  R('digoxin','sjw','avoid',null,"St. John's wort speeds up digoxin's removal from the body and can make it stop working.",['nccih-sjw','lbl-digoxin']),
+  R('digoxin','licorice','avoid',null,"Licorice lowers potassium, and low potassium makes digoxin toxicity more likely.",['nccih-licorice','lbl-digoxin']),
+  R('digoxin','sglt2','caution',null,"Canagliflozin (Invokana) raised digoxin levels in a study, so digoxin should be monitored. The other SGLT2 inhibitors didn't have this effect in their label studies.",['lbl-invokana']),
+  R('digoxin','thyroid-hormone','info',null,"Thyroid levels change how much digoxin you need. Starting or changing your thyroid dose may mean a digoxin dose check.",['lbl-digoxin']),
   R('nmn','niacin','info',null,"Both are forms of vitamin B3. Amounts from several B3 products add up, so check totals — especially if you also take high-dose niacin.",['ods-niacin','general'],'limited'),
   R('lipoic-acid','thyroid-hormone','caution',null,"Alpha-lipoic acid may lower thyroid hormone levels or reduce how well thyroid medication works. Your clinician may want to recheck your levels.",['general'],'limited'),
   R('horny-goat-weed','pde5','caution',null,"Icariin acts on the same pathway as ED medications in lab studies. The combination hasn't been studied in people.",['general'],'limited')
@@ -1108,6 +1167,7 @@ const CONDITIONS = [
     ['glp1','caution',"Vomiting or diarrhea from a GLP-1 drug can dehydrate you and worsen kidney function. Drink fluids and call your doctor if you can't keep them down.",['lbl-ozempic','lbl-mounjaro']],
     ['sglt2','info',"Jardiance and Farxiga are also used to protect the kidneys, but they aren't for people on dialysis, and whether they fit depends on your kidney function. Your prescriber will check it regularly.",['lbl-jardiance','lbl-farxiga']],
     ['dpp4','info',"Most DPP-4 inhibitors need a lower dose with reduced kidney function (linagliptin/Tradjenta is the exception).",['lbl-januvia']],
+    ['digoxin','caution',"Your kidneys clear digoxin, so it can build up when kidney function is reduced. Your dose is based on kidney tests and blood levels.",['lbl-digoxin']],
     ['lithium','caution',"Lithium is cleared by the kidneys; dosing needs close monitoring.",['lbl-lithium']],
     ['yohimbe','avoid',"Yohimbe has been linked to kidney failure, and people with kidney problems are advised not to use it.",['medlineplus-yohimbe']],
     ['licorice','caution',"Licorice has been linked to serious effects in people with kidney conditions.",['nccih-licorice']],
@@ -1236,6 +1296,8 @@ const CONDITIONS = [
     ,['sulfonylurea','caution',"The Beers Criteria advises against sulfonylureas for most older adults because of low-blood-sugar risk; if one is needed, short-acting glipizide is preferred over glyburide or glimepiride.",['beers']],
     ['insulin','info',"Low blood sugar is more dangerous in older adults (falls, confusion). Ask whether your glucose targets should be relaxed.",['beers']]
     ,['sglt2','caution',"Dehydration and urinary infections were more common in people 75 and older taking SGLT2 inhibitors. Drink fluids, and call your doctor if you're vomiting or can't eat.",['lbl-jardiance','beers']]
+    ,['digoxin','caution',"The Beers Criteria advises against digoxin as a first choice for atrial fibrillation or heart failure in older adults, and against doses above 0.125 mg a day.",['beers']]
+    ,['loop-diuretic','info',"Water pills can cause dizziness, low sodium, and dehydration in older adults, which raises fall risk. Stand up slowly and ask how much to drink.",['beers','lbl-furosemide']]
   ]}
 ];
 
@@ -1358,6 +1420,8 @@ const USES = {
   sulfonylurea:{rx:['Type 2 diabetes']},
   sglt2:{rx:['Type 2 diabetes','Heart failure (Jardiance, Farxiga)','Chronic kidney disease (Jardiance, Farxiga)','Lowering heart-related death in type 2 diabetes with heart disease']},
   dpp4:{rx:['Type 2 diabetes']},
+  furosemide:{rx:['Fluid buildup (edema) from heart failure, kidney, or liver disease','High blood pressure (some)']},
+  digoxin:{rx:['Heart failure','Controlling heart rate in atrial fibrillation']},
   tums:{rx:['Heartburn & acid indigestion','Calcium supplement']},
   diphenhydramine:{rx:['Allergies & hay fever','Occasional sleeplessness']},
   pde5:{rx:['Erectile dysfunction','Enlarged prostate / BPH (tadalafil)','Pulmonary arterial hypertension (Revatio, Adcirca)']},
@@ -2068,7 +2132,8 @@ function openDetail(id){
       <button class="btn cmp-toggle" data-action="cmp-toggle" data-id="${esc(item.id)}" aria-pressed="${ui.compare.includes(item.id)}">${ui.compare.includes(item.id)?'✓ In compare':'+ Compare'}</button>
       ${FORMS[item.id]?`<button class="btn forms-cta" data-action="compare-forms" data-id="${esc(item.id)}">${icon('link')}Compare forms</button>`:''}
       ${item.custom?`<button class="btn btn-danger" data-action="delete-custom" data-id="${esc(item.id)}">${icon('trash')}Delete custom item</button>`:''}
-    </div>`;
+    </div>
+    ${item.custom?'':`<p class="small" style="margin:14px 0 0"><button class="linkbtn" data-action="feedback-open" data-id="${esc(item.id)}">Report a problem with this information</button></p>`}`;
   const d=$('#detail-dialog'); if(!d.open) d.showModal();
 }
 
@@ -2817,6 +2882,7 @@ document.addEventListener('input', e=>{
 });
 
 document.addEventListener('submit', e=>{
+  if(e.target.id==='feedback-form'){ e.preventDefault(); sendFeedback(); return; }
   if(e.target.id==='save-form'){
     e.preventDefault();
     const inp = $('#save-name'), name = inp ? inp.value.trim() : '';
@@ -2883,6 +2949,53 @@ renderConditions();
 $('#storage-note').hidden = storageOK;
 refresh();
 
+
+/* ---------- feedback (Netlify Forms) ---------- */
+function openFeedback(itemId){
+  const f=$('#feedback-form'); f.reset(); ui.fbItem = itemId||null;
+  const it = itemId ? getItem(itemId) : null;
+  $('#fb-item-row').hidden = !it; if(it){ $('#fb-item-name').textContent = it.name; $('#fb-kind').value='info'; }
+  const st=$('#fb-msg-status'); st.textContent=''; st.className='small';
+  $('#fb-send').disabled=false;
+  document.querySelectorAll('dialog[open]').forEach(d=>{ if(d.id!=='feedback-dialog') d.close(); });
+  const d=$('#feedback-dialog'); if(!d.open) d.showModal();
+  setTimeout(()=>$('#fb-msg').focus(), 50);
+}
+function feedbackContext(){
+  const mobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'phone/tablet' : 'computer';
+  const app = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone ? 'installed app' : 'browser';
+  return `DB ${DB_META.version} · ${mobile} · ${app} · tab: ${ui.tab||'routine'}`;
+}
+async function sendFeedback(){
+  const f=$('#feedback-form'), st=$('#fb-msg-status'), btn=$('#fb-send');
+  const msg=$('#fb-msg').value.trim();
+  if(!msg){ st.textContent='Please write a little about what you noticed.'; st.className='small is-err'; $('#fb-msg').focus(); return; }
+  const it = ui.fbItem ? getItem(ui.fbItem) : null;
+  const body = new URLSearchParams({
+    'form-name':'feedback',
+    'bot-field': f.querySelector('[name=bot-field]').value,
+    kind: $('#fb-kind').value, message: msg, email: $('#fb-email').value.trim(),
+    item: it ? it.name : '',
+    stack: $('#fb-stack').checked ? state.regimen.map(e=>{ const x=getItem(e.itemId); return x?(x.custom?'(custom item)':x.name):''; }).filter(Boolean).join('; ') : '',
+    context: feedbackContext()
+  });
+  btn.disabled=true; st.textContent='Sending…'; st.className='small';
+  try{
+    if(!/^https?:$/.test(location.protocol)) throw new Error('offline-file');
+    const r = await fetch('/', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: body.toString()});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    st.textContent='Thank you! Your feedback was sent.'; st.className='small is-ok';
+    $('#fb-msg').value=''; setTimeout(()=>{ const d=$('#feedback-dialog'); if(d.open) d.close(); }, 1600);
+  }catch(err){
+    btn.disabled=false;
+    st.className='small is-err';
+    st.textContent = navigator.onLine===false ? "You're offline — please try again when you're connected." : "Couldn't send right now. Please try again in a bit.";
+  }
+}
+document.addEventListener('click', e=>{
+  const t=e.target.closest('[data-action="feedback-open"]'); if(!t) return;
+  e.preventDefault(); openFeedback(t.dataset.id);
+});
 /* ---------- install as an app (PWA) ---------- */
 if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
   window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
