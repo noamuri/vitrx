@@ -4,7 +4,7 @@ A medication, vitamin, and supplement scheduler that checks for interactions.
 
 Add what you take, and VitRx cross-checks every item against a database of known interactions. It then builds a daily schedule around your routine. For example, it spaces Adderall away from protein powder, keeps levothyroxine four hours from calcium and iron, and moves stimulants away from bedtime.
 
-🔗 Live app: https://YOUR-SITE.netlify.app
+🔗 Live app: https://vitrx.netlify.app
 
 ⚠️ Not medical advice. VitRx is an educational tool. Its database is a draft that hasn't been reviewed by a pharmacist yet. Always check changes to your medications or supplements with your doctor or pharmacist.
 
@@ -57,4 +57,4 @@ Pharmacist review of all interaction notes
 More items and citations
 Installable phone app (PWA) with offline support
 
-Built by Angelina Sorensen.
+Built by Noa Murikama.
