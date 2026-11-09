@@ -1,7 +1,7 @@
 // VitRx service worker — lets the app open offline and be installed.
 // Strategy: network first for the page (so updates show up right away),
 // falling back to the cached copy when offline.
-const CACHE = 'vitrx-v4';
+const CACHE = 'vitrx-v5';
 const CORE = ['/', '/index.html', '/manifest.webmanifest',
   '/icons/icon-192.png', '/icons/icon-512.png', '/icons/apple-touch-icon.png', '/icons/favicon-32.png'];
 

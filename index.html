@@ -731,7 +731,7 @@ function icon(name, cls='i'){ return `<svg class="${cls}" viewBox="0 0 24 24" fi
    Every rule and condition note carries src: [source keys] -> SOURCES.
    "general" = common pharmacist guidance still awaiting a specific citation.
    ===================================================================== */
-const DB_META = { version:'2026.11-draft4c', compiled:'2026-11-08', status:'Draft — compiled from FDA labels and NIH fact sheets; not yet reviewed by a pharmacist' };
+const DB_META = { version:'2026.11-draft5', compiled:'2026-11-08', status:'Draft — compiled from FDA labels and NIH fact sheets; not yet reviewed by a pharmacist' };
 
 const TYPES = {medication:'Medication', vitamin:'Vitamin / mineral', supplement:'Supplement', food:'Food & drink'};
 const FOOD = {E:'Empty stomach', W:'With food', F:'With a meal that has some fat', A:'With or without food'};
@@ -789,6 +789,20 @@ const SOURCES = {
   'lbl-furosemide':L('Furosemide (Lasix)','furosemide'),
   'lbl-digoxin':L('Digoxin (Lanoxin)','digoxin'),
   'lbl-invokana':L('Canagliflozin (Invokana)','canagliflozin'),
+  'lbl-hydrocodone':L('Hydrocodone and acetaminophen (Norco)','hydrocodone bitartrate and acetaminophen'),
+  'lbl-oxycodone':L('Oxycodone (Roxicodone, OxyContin)','oxycodone hydrochloride'),
+  'lbl-tramadol':L('Tramadol (Ultram)','tramadol hydrochloride'),
+  'lbl-codeine':L('Acetaminophen and codeine (Tylenol #3)','acetaminophen and codeine'),
+  'lbl-morphine':L('Morphine sulfate','morphine sulfate'),
+  'lbl-tapentadol':L('Tapentadol (Nucynta)','tapentadol'),
+  'lbl-methadone':L('Methadone','methadone hydrochloride'),
+  'lbl-buprenorphine':L('Buprenorphine and naloxone (Suboxone)','buprenorphine and naloxone'),
+  'lbl-fentanyl':L('Fentanyl transdermal system','fentanyl transdermal'),
+  'lbl-alprazolam':L('Alprazolam (Xanax)','alprazolam'),
+  'lbl-naloxone':L('Naloxone nasal spray (Narcan)','naloxone nasal'),
+  'fda-opioid-benzo':{org:'FDA Drug Safety Communication (2016)', title:'Boxed warnings on combining opioids with benzodiazepines or other CNS depressants', url:null},
+  'fda-opioid-serotonin':{org:'FDA Drug Safety Communication (2016)', title:'Opioids: serotonin syndrome with serotonergic drugs, adrenal insufficiency, low sex hormones', url:null},
+  'fda-gabapentinoid':{org:'FDA Drug Safety Communication (2019)', title:'Serious breathing problems with gabapentin or pregabalin taken with opioids or other CNS depressants', url:null},
   'lbl-lisinopril':L('Lisinopril','lisinopril'),
   'lbl-spironolactone':L('Spironolactone','spironolactone'),
   'lbl-hctz':L('Hydrochlorothiazide','hydrochlorothiazide'),
@@ -875,6 +889,17 @@ const ITEMS = [
   I('ibuprofen',"Ibuprofen (Advil, Motrin)",'medication',['advil','motrin','nsaid','pain reliever'],['nsaid'],['breakfast','lunch','dinner'],'W',"Take with food or milk to protect your stomach.",{defaultFreq:'prn',src:['lbl-ibuprofen']}),
   I('naproxen',"Naproxen (Aleve)",'medication',['aleve','naprosyn','nsaid','pain reliever'],['nsaid'],['breakfast','dinner'],'W',"Take with food. Longer-acting than ibuprofen.",{defaultFreq:'prn'}),
   I('acetaminophen',"Acetaminophen (Tylenol)",'medication',['tylenol','paracetamol','pain reliever'],['acetaminophen'],['breakfast','lunch','dinner'],'A',"Check cold/flu combination products so you don't double up. The label lists your daily maximum.",{defaultFreq:'prn',src:['lbl-acetaminophen']}),
+  I('hydrocodone',"Hydrocodone (Norco, Vicodin, Lortab, Hysingla ER)",'medication',['norco','vicodin','lortab','lorcet','hysingla','zohydro','hydrocodone acetaminophen','hydrocodone apap','opioid','pain reliever','painkiller'],['opioid','cyp3a4-opioid','apap-combo','sedating'],['breakfast','lunch','dinner'],'A',"Opioid. Can cause drowsiness, constipation, and slowed breathing — never mix with alcohol, and keep naloxone (Narcan) at home. Most short-acting versions (Norco, Vicodin, Lortab) also contain acetaminophen — count it toward your daily Tylenol limit.",{defaultFreq:'prn',src:['lbl-hydrocodone']}),
+  I('oxycodone',"Oxycodone (Percocet, OxyContin, Roxicodone)",'medication',['percocet','oxycontin','roxicodone','oxy ir','endocet','xtampza','oxycodone acetaminophen','opioid','pain reliever','painkiller'],['opioid','cyp3a4-opioid','apap-combo','sedating'],['breakfast','lunch','dinner'],'A',"Opioid. Can cause drowsiness, constipation, and slowed breathing — never mix with alcohol, and keep naloxone (Narcan) at home. Percocet and Endocet also contain acetaminophen. Swallow extended-release tablets whole — never crush, chew, or break them.",{defaultFreq:'prn',src:['lbl-oxycodone']}),
+  I('tramadol',"Tramadol (Ultram)",'medication',['ultram','conzip','ultracet','tramadol acetaminophen','opioid','pain reliever','painkiller'],['opioid','serotonergic-opioid','lowers-seizure-threshold','sedating'],['breakfast','lunch','dinner'],'A',"Opioid. Can cause drowsiness, constipation, and slowed breathing — never mix with alcohol, and keep naloxone (Narcan) at home. Tramadol also raises serotonin and can trigger seizures, so it interacts with many antidepressants.",{defaultFreq:'prn',src:['lbl-tramadol']}),
+  I('codeine',"Codeine (Tylenol #3, codeine cough syrup)",'medication',['tylenol 3','tylenol #3','tylenol with codeine','codeine syrup','promethazine codeine','opioid','cough syrup','pain reliever'],['opioid','apap-combo','sedating'],['breakfast','lunch','dinner'],'A',"Opioid. Can cause drowsiness, constipation, and slowed breathing — never mix with alcohol, and keep naloxone (Narcan) at home. Tylenol #3 contains acetaminophen. Some people turn codeine into morphine unusually fast, which can be dangerous — it's not used in children under 12.",{defaultFreq:'prn',src:['lbl-codeine']}),
+  I('morphine',"Morphine & hydromorphone (MS Contin, Dilaudid)",'medication',['ms contin','kadian','morphine','hydromorphone','dilaudid','exalgo','oxymorphone','opana','opioid','pain reliever','painkiller'],['opioid','sedating'],['breakfast','dinner'],'A',"Opioid. Can cause drowsiness, constipation, and slowed breathing — never mix with alcohol, and keep naloxone (Narcan) at home. Swallow extended-release forms whole.",{src:['lbl-morphine']}),
+  I('tapentadol',"Tapentadol (Nucynta)",'medication',['nucynta','tapentadol','opioid','pain reliever'],['opioid','serotonergic-opioid','lowers-seizure-threshold','sedating'],['breakfast','dinner'],'A',"Opioid. Can cause drowsiness, constipation, and slowed breathing — never mix with alcohol, and keep naloxone (Narcan) at home. Like tramadol, it also affects serotonin.",{src:['lbl-tapentadol']}),
+  I('methadone',"Methadone",'medication',['methadose','dolophine','methadone','opioid','opioid use disorder','oud','mat','moud'],['opioid','serotonergic-opioid','cyp3a4-opioid','sedating'],['breakfast'],'A',"Opioid. Can cause drowsiness, constipation, and slowed breathing — never mix with alcohol, and keep naloxone (Narcan) at home. Used for pain and for opioid use disorder. Lasts much longer than its pain relief, so it builds up over days — only change the dose as directed. Can affect heart rhythm (QT). Many drugs change methadone levels; check every new medicine with your pharmacist.",{src:['lbl-methadone']}),
+  I('buprenorphine',"Buprenorphine (Suboxone, Sublocade, Butrans)",'medication',['suboxone','zubsolv','subutex','sublocade','brixadi','butrans','belbuca','buprenorphine naloxone','opioid','opioid use disorder','oud','mat','moud'],['opioid','cyp3a4-opioid','sedating'],['breakfast'],'A',"Opioid. Can cause drowsiness, constipation, and slowed breathing — never mix with alcohol, and keep naloxone (Narcan) at home. Film or tablet goes under the tongue (or inside the cheek) until fully dissolved — don't chew or swallow it, and don't eat or drink until it's gone. Used for opioid use disorder and pain.",{src:['lbl-buprenorphine']}),
+  I('fentanyl',"Fentanyl patch (Duragesic)",'medication',['duragesic','fentanyl patch','fentanyl','opioid','pain patch'],['opioid','serotonergic-opioid','cyp3a4-opioid','sedating'],['breakfast'],'A',"Opioid. Can cause drowsiness, constipation, and slowed breathing — never mix with alcohol, and keep naloxone (Narcan) at home. For people already used to opioids. A new patch usually every 72 hours, at the same time of day. Heat (heating pads, electric blankets, hot tubs, fever) makes it release faster — avoid it. Fold used patches sticky-side together and flush or use a drug take-back.",{defaultFreq:'prn',src:['lbl-fentanyl']}),
+  I('benzodiazepine',"Benzodiazepines (Xanax, Ativan, Klonopin, Valium)",'medication',['xanax','alprazolam','ativan','lorazepam','klonopin','clonazepam','valium','diazepam','restoril','temazepam','benzo','benzos','anxiety','panic','sleep'],['benzodiazepine','sedating'],['bedtime','breakfast'],'A',"Causes drowsiness and slows reactions. Don't stop suddenly after regular use — withdrawal can be dangerous; your prescriber will taper it.",{src:['lbl-alprazolam']}),
+  I('naloxone',"Naloxone (Narcan, RiVive)",'medication',['narcan','rivive','kloxxado','zimhi','naloxone','overdose reversal','opioid overdose'],['naloxone'],['breakfast'],'A',"Emergency spray that reverses an opioid overdose. Sold over the counter. Keep it where others can find it, and tell them how to use it: spray in one nostril, call 911, and give a second dose after 2–3 minutes if there's no response. It isn't part of a daily schedule.",{defaultFreq:'prn',src:['lbl-naloxone']}),
   I('prednisone',"Prednisone & oral steroids",'medication',['prednisolone','methylprednisolone','medrol','dexamethasone','steroid','corticosteroid'],['corticosteroid'],['breakfast'],'W',"Take in the morning with food — later doses can cause insomnia and stomach upset.",{src:['lbl-prednisone']}),
   I('metformin',"Metformin (Glucophage)",'medication',['glucophage','glumetza','fortamet','diabetes'],['metformin'],['dinner','breakfast'],'W',"Take with meals to reduce stomach upset. Extended-release versions are usually taken with the evening meal.",{src:['lbl-metformin']}),
   I('semaglutide',"Semaglutide injection (Ozempic, Wegovy)",'medication',['ozempic','wegovy','semaglutide','glp-1','glp1','weight loss shot','weight loss injection','diabetes'],['glp1'],['breakfast'],'A',"Once a week on the same day, any time of day, with or without food. If you need to change your injection day, ask your pharmacist how. GLP-1 drugs slow how fast the stomach empties, so nausea, fullness and constipation are common at first and after each dose increase. Smaller meals help.",{defaultFreq:'weekly',src:['lbl-ozempic']}),
@@ -1130,6 +1155,19 @@ const RULES = [
   R('digoxin','licorice','avoid',null,"Licorice lowers potassium, and low potassium makes digoxin toxicity more likely.",['nccih-licorice','lbl-digoxin']),
   R('digoxin','sglt2','caution',null,"Canagliflozin (Invokana) raised digoxin levels in a study, so digoxin should be monitored. The other SGLT2 inhibitors didn't have this effect in their label studies.",['lbl-invokana']),
   R('digoxin','thyroid-hormone','info',null,"Thyroid levels change how much digoxin you need. Starting or changing your thyroid dose may mean a digoxin dose check.",['lbl-digoxin']),
+  R('opioid','benzodiazepine','avoid',null,"FDA boxed warning: opioids plus benzodiazepines can cause extreme sleepiness, slowed or stopped breathing, coma, and death. Only take them together if your prescriber has planned it on purpose — and keep naloxone at home.",['fda-opioid-benzo']),
+  R('opioid','alcohol','avoid',null,"Alcohol with an opioid can slow or stop breathing. Don't drink while taking it. Some extended-release opioids can also release all at once with alcohol.",['fda-opioid-benzo','lbl-oxycodone']),
+  R('opioid','gabapentin','caution',null,"The FDA warns gabapentin and pregabalin can cause serious breathing problems when combined with opioids — especially in older adults or people with lung disease. Your prescriber may start at a lower dose.",['fda-gabapentinoid']),
+  R('opioid','sedating','caution',null,"Other drowsy-making medicines and supplements (sleep aids, muscle relaxants, kava, valerian) add to an opioid's sedation and can slow breathing. Ask before combining.",['fda-opioid-benzo']),
+  R('opioid','opioid','caution',null,"Two opioids at once adds up the risk of overdose. Make sure your prescribers know about both.",['fda-opioid-benzo']),
+  R('serotonergic-opioid','serotonergic-rx','caution',null,"This opioid can raise serotonin. With antidepressants like SSRIs or SNRIs, watch for serotonin syndrome: agitation, fast heartbeat, fever, sweating, shivering, muscle twitching — get care right away.",['fda-opioid-serotonin','lbl-tramadol']),
+  R('serotonergic-opioid','serotonergic-supp','caution',null,"This opioid can raise serotonin, and so can this supplement. Together they raise the risk of serotonin syndrome — ask before combining.",['fda-opioid-serotonin','nccih-sjw']),
+  R('lowers-seizure-threshold','bupropion','caution',null,"Both lower the seizure threshold, so together they raise seizure risk.",['lbl-tramadol','lbl-bupropion']),
+  R('cyp3a4-opioid','grapefruit','caution',null,"Grapefruit blocks the enzyme (CYP3A4) that breaks down this opioid, which can raise levels and slow breathing. Avoid grapefruit or ask your pharmacist.",['lbl-oxycodone','lbl-fentanyl'],'limited'),
+  R('cyp3a4-opioid','sjw','caution',null,"St. John's wort speeds up the breakdown of this opioid — it may work less well, or cause withdrawal. Stopping St. John's wort later can make levels jump.",['nccih-sjw','lbl-oxycodone']),
+  R('apap-combo','acetaminophen','caution',null,"This prescription already contains acetaminophen (Tylenol). Count every source — prescriptions, Tylenol, cold and flu products — and stay under the daily limit on the label. Too much can seriously damage the liver.",['lbl-acetaminophen','lbl-hydrocodone']),
+  R('opioid','naloxone','pairs',null,"Keeping naloxone at home is recommended for anyone with an opioid prescription. Make sure someone you live with knows where it is and how to use it.",['lbl-naloxone']),
+  R('benzodiazepine','sedating','caution',null,"Benzodiazepines add to the drowsiness from other sedating medicines, supplements, and alcohol. Avoid driving and don't mix with alcohol.",['lbl-alprazolam']),
   R('nmn','niacin','info',null,"Both are forms of vitamin B3. Amounts from several B3 products add up, so check totals — especially if you also take high-dose niacin.",['ods-niacin','general'],'limited'),
   R('lipoic-acid','thyroid-hormone','caution',null,"Alpha-lipoic acid may lower thyroid hormone levels or reduce how well thyroid medication works. Your clinician may want to recheck your levels.",['general'],'limited'),
   R('horny-goat-weed','pde5','caution',null,"Icariin acts on the same pathway as ED medications in lab studies. The combination hasn't been studied in people.",['general'],'limited')
@@ -1138,6 +1176,8 @@ const RULES = [
 // Condition cautions: [selector, severity, note, src[]]
 const CONDITIONS = [
   {id:'pregnancy', name:"Pregnant or trying to conceive", c:[
+    ['opioid','caution',"Regular opioid use in pregnancy can cause withdrawal in the newborn. Don't stop suddenly — talk with your OB about the safest plan (buprenorphine or methadone are standard treatment for opioid use disorder in pregnancy).",['lbl-oxycodone','lbl-buprenorphine']],
+    ['benzodiazepine','caution',"Benzodiazepines late in pregnancy can cause sleepiness and withdrawal in the newborn. Talk with your OB; don't stop suddenly.",['lbl-alprazolam']],
     ['isotretinoin','avoid',"Isotretinoin causes severe birth defects and is contraindicated in pregnancy.",['lbl-isotretinoin']],
     ['glp1','caution',"Tell your prescriber. Semaglutide should be stopped at least 2 months before a planned pregnancy because it stays in the body a long time; weight-loss versions are stopped once pregnancy is confirmed.",['lbl-ozempic','lbl-rybelsus','lbl-mounjaro']],
     ['sglt2','caution',"SGLT2 inhibitors aren't recommended in the second and third trimesters or while breastfeeding. Talk to your prescriber.",['lbl-jardiance']],
@@ -1161,6 +1201,9 @@ const CONDITIONS = [
     ['hormonal-supp','caution',"Products marketed to change hormone levels haven't been shown safe in pregnancy."]
   ]},
   {id:'kidney', name:"Kidney disease", c:[
+    ['morphine','caution',"Morphine's byproducts build up when the kidneys are weak, raising the risk of side effects. Your prescriber may choose a different opioid or a lower dose.",['lbl-morphine']],
+    ['codeine','caution',"Codeine's byproducts can build up with kidney disease.",['lbl-codeine']],
+    ['tramadol','caution',"Tramadol needs a lower dose or longer gaps between doses with reduced kidney function.",['lbl-tramadol']],
     ['potassium','avoid',"Kidneys clear excess potassium. Don't take potassium unless your nephrologist prescribed it.",['ods-potassium']],
     ['magnesium','caution',"Magnesium can build up when kidney function is reduced.",['ods-magnesium']],
     ['nsaid','avoid',"NSAIDs can worsen kidney function. Ask about alternatives.",['lbl-ibuprofen']],
@@ -1242,6 +1285,8 @@ const CONDITIONS = [
     ['alcohol','caution',"Alcohol irritates the stomach lining and worsens reflux."]
   ]},
   {id:'liver', name:"Liver disease", c:[
+    ['opioid','caution',"The liver breaks down most opioids, so levels can build up with liver disease. Lower doses are often used.",['lbl-oxycodone','lbl-hydrocodone']],
+    ['apap-combo','caution',"This prescription contains acetaminophen. With liver disease, your safe daily limit may be much lower — ask your doctor.",['lbl-acetaminophen']],
     ['kava','avoid',"Kava has been linked to rare but severe, sometimes fatal, liver injury.",['nccih-kava']],
     ['alcohol','avoid',"Alcohol further damages the liver."],
     ['acetaminophen','caution',"Your safe daily maximum may be lower — ask your doctor.",['lbl-acetaminophen']],
@@ -1263,6 +1308,7 @@ const CONDITIONS = [
     ['serotonergic-supp','caution',"Serotonin-boosting supplements may trigger mania in bipolar disorder."]
   ]},
   {id:'seizure', name:"Seizure disorder / epilepsy", c:[
+    ['lowers-seizure-threshold','caution',"Tramadol and tapentadol can cause seizures, and the risk is higher with a seizure history.",['lbl-tramadol','lbl-tapentadol']],
     ['bupropion','avoid',"Bupropion lowers the seizure threshold and is contraindicated with seizure disorders.",['lbl-bupropion']],
     ['yohimbe','avoid',"Yohimbine has been associated with seizures.",['nccih-yohimbe']],
     ['carnitine','caution',"Seizures have been reported with carnitine in people with a seizure history.",['general']]
@@ -1289,7 +1335,14 @@ const CONDITIONS = [
   {id:'uti', name:"Frequent UTIs or yeast infections", c:[
     ['sglt2','caution',"SGLT2 inhibitors pass sugar into the urine, which raises the risk of genital yeast infections and UTIs — more so if you've had them before. Good hygiene and fluids help; get symptoms checked promptly.",['lbl-jardiance']]
   ]},
+  {id:'lung', name:"Sleep apnea, COPD, or other lung disease", c:[
+    ['opioid','caution',"Opioids slow breathing, which is riskier with sleep apnea or lung disease — especially at night or with other sedating medicines. Make sure your prescriber knows; use your CPAP if you have one.",['lbl-oxycodone','fda-gabapentinoid']],
+    ['benzodiazepine','caution',"Benzodiazepines can worsen breathing problems in sleep apnea and lung disease.",['lbl-alprazolam']],
+    ['gabapentin','caution',"The FDA warns gabapentin and pregabalin can cause serious breathing problems in people with lung disease.",['fda-gabapentinoid']]
+  ]},
   {id:'older-adult', name:"Age 65 or older", c:[
+    ['opioid','caution',"The Beers Criteria advises avoiding opioids together with benzodiazepines or gabapentin/pregabalin in older adults, and notes higher fall risk. Start-low dosing is common.",['beers']],
+    ['benzodiazepine','caution',"The Beers Criteria advises avoiding benzodiazepines in older adults when possible — they raise the risk of falls, fractures, confusion, and car accidents.",['beers']],
     ['first-gen-antihistamine','caution',"The AGS Beers Criteria lists diphenhydramine and similar antihistamines as best avoided in older adults (confusion, falls, constipation).",['beers']],
     ['nsaid','caution',"The Beers Criteria advises avoiding long-term NSAID use in older adults unless other options fail (stomach bleeding, kidney risk).",['beers']],
     ['sedating','info',"Sedating products raise fall risk in older adults — combine carefully.",['beers']]
@@ -1422,6 +1475,17 @@ const USES = {
   dpp4:{rx:['Type 2 diabetes']},
   furosemide:{rx:['Fluid buildup (edema) from heart failure, kidney, or liver disease','High blood pressure (some)']},
   digoxin:{rx:['Heart failure','Controlling heart rate in atrial fibrillation']},
+  hydrocodone:{rx:['Pain severe enough to need an opioid when other treatments aren\'t enough']},
+  oxycodone:{rx:['Pain severe enough to need an opioid when other treatments aren\'t enough']},
+  tramadol:{rx:['Pain severe enough to need an opioid when other treatments aren\'t enough']},
+  codeine:{rx:['Mild to moderate pain (with acetaminophen)','Cough (syrups)']},
+  morphine:{rx:['Pain severe enough to need an opioid']},
+  tapentadol:{rx:['Acute pain','Diabetic nerve pain (Nucynta ER)']},
+  methadone:{rx:['Opioid use disorder','Severe chronic pain']},
+  buprenorphine:{rx:['Opioid use disorder (Suboxone, Sublocade)','Chronic pain (Butrans, Belbuca)']},
+  fentanyl:{rx:['Severe chronic pain in people already used to opioids']},
+  benzodiazepine:{rx:['Anxiety and panic disorder','Seizures (some)','Short-term insomnia (some)','Alcohol withdrawal (some)']},
+  naloxone:{rx:['Emergency reversal of an opioid overdose']},
   tums:{rx:['Heartburn & acid indigestion','Calcium supplement']},
   diphenhydramine:{rx:['Allergies & hay fever','Occasional sleeplessness']},
   pde5:{rx:['Erectile dysfunction','Enlarged prostate / BPH (tadalafil)','Pulmonary arterial hypertension (Revatio, Adcirca)']},
@@ -1605,9 +1669,17 @@ function rulesFor(x, y){
     if(matches(x,r.a)&&matches(y,r.b)) out.push({rule:r,a:x,b:y});
     else if(matches(y,r.a)&&matches(x,r.b)) out.push({rule:r,a:y,b:x});
   }
-  if(out.some(o=>!o.rule.generic)) return out.filter(o=>!o.rule.generic);
-  return out;
+  const kept = out.some(o=>!o.rule.generic) ? out.filter(o=>!o.rule.generic) : out;
+  // Spacing rules all apply. For warnings (no spacing), show only the most important one per pair:
+  // most severe first, then the most specific (item > tag > broad 'sedating' tag > type).
+  const gapped = kept.filter(o=>o.rule.gap!=null);
+  const pick = list => { if(list.length<2) return list; list.sort((p,q)=> SEVRANK[p.rule.sev]-SEVRANK[q.rule.sev] || ruleSpec(q.rule)-ruleSpec(p.rule)); return [list[0]]; };
+  const warn = pick(kept.filter(o=>o.rule.gap==null && o.rule.sev!=='pairs'));
+  const pairs = pick(kept.filter(o=>o.rule.gap==null && o.rule.sev==='pairs'));
+  return [...gapped, ...warn, ...pairs];
 }
+function selSpec(sel){ return sel.startsWith('type:') ? 0 : sel==='sedating' ? 1 : ITEMS.some(i=>i.id===sel) ? 3 : 2; }
+function ruleSpec(r){ return selSpec(r.a)+selSpec(r.b); }
 function reqGaps(rule){ const g=rule.gap; if(g==null) return [0,0]; if(typeof g==='number') return [g,g]; return [g.aFirst||0, g.bFirst||0]; }
 // ta = time of the item matching rule.a, tb = time of item matching rule.b (minutes). Daily repetition => check both arcs.
 function gapOk(rule, ta, tb){
