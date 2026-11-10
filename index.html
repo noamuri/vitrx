@@ -731,7 +731,7 @@ function icon(name, cls='i'){ return `<svg class="${cls}" viewBox="0 0 24 24" fi
    Every rule and condition note carries src: [source keys] -> SOURCES.
    "general" = common pharmacist guidance still awaiting a specific citation.
    ===================================================================== */
-const DB_META = { version:'2026.11-draft5', compiled:'2026-11-08', status:'Draft — compiled from FDA labels and NIH fact sheets; not yet reviewed by a pharmacist' };
+const DB_META = { version:'2026.11-draft5b', compiled:'2026-11-08', status:'Draft — compiled from FDA labels and NIH fact sheets; not yet reviewed by a pharmacist' };
 
 const TYPES = {medication:'Medication', vitamin:'Vitamin / mineral', supplement:'Supplement', food:'Food & drink'};
 const FOOD = {E:'Empty stomach', W:'With food', F:'With a meal that has some fat', A:'With or without food'};
@@ -800,6 +800,7 @@ const SOURCES = {
   'lbl-fentanyl':L('Fentanyl transdermal system','fentanyl transdermal'),
   'lbl-alprazolam':L('Alprazolam (Xanax)','alprazolam'),
   'lbl-naloxone':L('Naloxone nasal spray (Narcan)','naloxone nasal'),
+  'lbl-cyclobenzaprine':L('Cyclobenzaprine (Flexeril, Amrix)','cyclobenzaprine'),
   'fda-opioid-benzo':{org:'FDA Drug Safety Communication (2016)', title:'Boxed warnings on combining opioids with benzodiazepines or other CNS depressants', url:null},
   'fda-opioid-serotonin':{org:'FDA Drug Safety Communication (2016)', title:'Opioids: serotonin syndrome with serotonergic drugs, adrenal insufficiency, low sex hormones', url:null},
   'fda-gabapentinoid':{org:'FDA Drug Safety Communication (2019)', title:'Serious breathing problems with gabapentin or pregabalin taken with opioids or other CNS depressants', url:null},
@@ -882,6 +883,7 @@ const ITEMS = [
   I('bupropion',"Bupropion (Wellbutrin)",'medication',['wellbutrin','zyban','antidepressant'],['bupropion'],['breakfast','wake'],'A',"Take in the morning. If twice daily, take the second dose by mid-afternoon to protect sleep.",{bid2:['lunch'],late:8,src:['lbl-bupropion']}),
   I('lithium',"Lithium (Lithobid)",'medication',['lithobid','lithium carbonate','bipolar'],['lithium'],['dinner','breakfast'],'W',"Take with food. Keep salt, fluid and caffeine intake steady — dehydration and big changes can shift lithium levels.",{src:['lbl-lithium']}),
   I('gabapentin',"Gabapentin (Neurontin)",'medication',['neurontin','gralise','nerve pain'],['gabapentin','sedating'],['bedtime','dinner'],'A',"Often taken 3 times a day. Causes drowsiness and dizziness — don't combine with alcohol without asking your prescriber.",{defaultFreq:'three',src:['lbl-gabapentin']}),
+  I('cyclobenzaprine',"Cyclobenzaprine (Flexeril, Amrix)",'medication',['flexeril','amrix','fexmid','cyclobenzaprine','muscle relaxant','muscle spasm','back pain'],['cyclobenzaprine','muscle-relaxant','sedating','anticholinergic'],['bedtime','breakfast','dinner'],'A',"A muscle relaxant for short-term muscle spasms — the label says it's meant for 2–3 weeks. It's very drowsy-making, so many people take it at bedtime; avoid driving until you know how it affects you. Dry mouth and constipation are common. Never take it with an MAOI antidepressant or within 14 days of stopping one.",{src:['lbl-cyclobenzaprine']}),
   I('warfarin',"Warfarin (Coumadin, Jantoven)",'medication',['coumadin','jantoven','blood thinner','anticoagulant'],['anticoagulant','blood-thinner'],['dinner','bedtime'],'A',"Same time every day (often evening). Many supplements and foods affect it — tell your anticoagulation clinic before changing anything.",{src:['lbl-warfarin']}),
   I('doac',"Apixaban / rivaroxaban (Eliquis, Xarelto)",'medication',['eliquis','xarelto','apixaban','rivaroxaban','blood thinner','anticoagulant','doac'],['doac','blood-thinner'],['breakfast','dinner'],'A',"Apixaban is usually twice daily. Rivaroxaban 15 mg and 20 mg doses should be taken with food (often the evening meal).",{defaultFreq:'twice',bid2:['dinner'],src:['lbl-apixaban']}),
   I('aspirin',"Low-dose aspirin (81 mg)",'medication',['baby aspirin','bayer','ecotrin','81 mg aspirin','asa'],['antiplatelet','blood-thinner','aspirin'],['breakfast'],'W',"Usually once daily. If you also take ibuprofen, timing matters (see interactions). The FDA timing advice applies to immediate-release, not enteric-coated, aspirin.",{src:['fda-asa-ibu']}),
@@ -1168,6 +1170,12 @@ const RULES = [
   R('apap-combo','acetaminophen','caution',null,"This prescription already contains acetaminophen (Tylenol). Count every source — prescriptions, Tylenol, cold and flu products — and stay under the daily limit on the label. Too much can seriously damage the liver.",['lbl-acetaminophen','lbl-hydrocodone']),
   R('opioid','naloxone','pairs',null,"Keeping naloxone at home is recommended for anyone with an opioid prescription. Make sure someone you live with knows where it is and how to use it.",['lbl-naloxone']),
   R('benzodiazepine','sedating','caution',null,"Benzodiazepines add to the drowsiness from other sedating medicines, supplements, and alcohol. Avoid driving and don't mix with alcohol.",['lbl-alprazolam']),
+  R('cyclobenzaprine','serotonergic-rx','caution',null,"The cyclobenzaprine label lists serotonin syndrome with SSRIs, SNRIs, and similar antidepressants. Know the signs — agitation, fast heartbeat, fever, sweating, shivering, muscle twitching — and get care right away if they appear.",['lbl-cyclobenzaprine']),
+  R('cyclobenzaprine','serotonergic-opioid','caution',null,"The label lists serotonin syndrome with tramadol, and tramadol plus cyclobenzaprine may also raise seizure risk. Both are sedating, too.",['lbl-cyclobenzaprine','lbl-tramadol']),
+  R('cyclobenzaprine','serotonergic-supp','caution',null,"Cyclobenzaprine can add to the serotonin effects of St. John's wort, 5-HTP, or tryptophan. Ask before combining.",['lbl-cyclobenzaprine']),
+  R('cyclobenzaprine','bupropion','caution',null,"The cyclobenzaprine label lists bupropion among drugs linked to serotonin syndrome when combined.",['lbl-cyclobenzaprine']),
+  R('cyclobenzaprine','alcohol','avoid',null,"Cyclobenzaprine strengthens the effects of alcohol — much more drowsiness and impaired coordination. Don't drink while taking it.",['lbl-cyclobenzaprine']),
+  R('anticholinergic','first-gen-antihistamine','caution',null,"Both have anticholinergic effects that add up: dry mouth, constipation, blurry vision, trouble urinating, and (especially in older adults) confusion. Plus double the drowsiness.",['lbl-cyclobenzaprine','beers']),
   R('nmn','niacin','info',null,"Both are forms of vitamin B3. Amounts from several B3 products add up, so check totals — especially if you also take high-dose niacin.",['ods-niacin','general'],'limited'),
   R('lipoic-acid','thyroid-hormone','caution',null,"Alpha-lipoic acid may lower thyroid hormone levels or reduce how well thyroid medication works. Your clinician may want to recheck your levels.",['general'],'limited'),
   R('horny-goat-weed','pde5','caution',null,"Icariin acts on the same pathway as ED medications in lab studies. The combination hasn't been studied in people.",['general'],'limited')
@@ -1228,6 +1236,7 @@ const CONDITIONS = [
     ['bupropion','caution',"Bupropion can raise blood pressure in some people.",['lbl-bupropion']]
   ]},
   {id:'heart', name:"Heart disease or arrhythmia", c:[
+    ['cyclobenzaprine','avoid',"Cyclobenzaprine is not for use during recovery from a heart attack or with arrhythmias, heart block, or heart failure (it's related to tricyclic antidepressants, which affect heart rhythm).",['lbl-cyclobenzaprine']],
     ['dpp4','caution',"Saxagliptin (Onglyza) and alogliptin (Nesina) have been linked to hospitalization for heart failure. Ask whether another option fits better.",['lbl-saxagliptin']],
     ['licorice','avoid',"Glycyrrhizin can cause irregular heartbeat, especially in people with heart conditions.",['nccih-licorice']],
     ['yohimbe','avoid',"Yohimbine has been linked to irregular heartbeat and heart attacks.",['nccih-yohimbe']],
@@ -1262,6 +1271,7 @@ const CONDITIONS = [
     ['ashwagandha','caution',"May affect thyroid hormone levels; ask your clinician.",['ods-ashwagandha']]
   ]},
   {id:'hyperthyroid', name:"Hyperthyroidism / Graves'", c:[
+    ['cyclobenzaprine','avoid',"The cyclobenzaprine label lists hyperthyroidism as a reason not to use it.",['lbl-cyclobenzaprine']],
     ['ashwagandha','avoid',"Ashwagandha may increase thyroid hormone levels.",['ods-ashwagandha']],
     ['iodine','caution',"Extra iodine can worsen hyperthyroidism.",['ods-iodine']],
     ['caffeine','caution',"Caffeine can worsen a racing heart and jitteriness."],
@@ -1285,6 +1295,7 @@ const CONDITIONS = [
     ['alcohol','caution',"Alcohol irritates the stomach lining and worsens reflux."]
   ]},
   {id:'liver', name:"Liver disease", c:[
+    ['cyclobenzaprine','caution',"Not recommended with moderate or severe liver disease; with mild liver problems, a lower dose is used.",['lbl-cyclobenzaprine']],
     ['opioid','caution',"The liver breaks down most opioids, so levels can build up with liver disease. Lower doses are often used.",['lbl-oxycodone','lbl-hydrocodone']],
     ['apap-combo','caution',"This prescription contains acetaminophen. With liver disease, your safe daily limit may be much lower — ask your doctor.",['lbl-acetaminophen']],
     ['kava','avoid',"Kava has been linked to rare but severe, sometimes fatal, liver injury.",['nccih-kava']],
@@ -1308,6 +1319,7 @@ const CONDITIONS = [
     ['serotonergic-supp','caution',"Serotonin-boosting supplements may trigger mania in bipolar disorder."]
   ]},
   {id:'seizure', name:"Seizure disorder / epilepsy", c:[
+    ['cyclobenzaprine','info',"Seizures have been reported rarely, mostly with overdose or when combined with tramadol.",['lbl-cyclobenzaprine']],
     ['lowers-seizure-threshold','caution',"Tramadol and tapentadol can cause seizures, and the risk is higher with a seizure history.",['lbl-tramadol','lbl-tapentadol']],
     ['bupropion','avoid',"Bupropion lowers the seizure threshold and is contraindicated with seizure disorders.",['lbl-bupropion']],
     ['yohimbe','avoid',"Yohimbine has been associated with seizures.",['nccih-yohimbe']],
@@ -1340,7 +1352,12 @@ const CONDITIONS = [
     ['benzodiazepine','caution',"Benzodiazepines can worsen breathing problems in sleep apnea and lung disease.",['lbl-alprazolam']],
     ['gabapentin','caution',"The FDA warns gabapentin and pregabalin can cause serious breathing problems in people with lung disease.",['fda-gabapentinoid']]
   ]},
+  {id:'glaucoma-urinary', name:"Narrow-angle glaucoma, or trouble emptying your bladder (e.g. enlarged prostate)", c:[
+    ['anticholinergic','caution',"Cyclobenzaprine has anticholinergic effects that can raise eye pressure and make it harder to urinate. Use with caution — ask your doctor.",['lbl-cyclobenzaprine']],
+    ['first-gen-antihistamine','caution',"Diphenhydramine and similar antihistamines can raise eye pressure and make it harder to urinate.",['beers']]
+  ]},
   {id:'older-adult', name:"Age 65 or older", c:[
+    ['cyclobenzaprine','caution',"The Beers Criteria advises avoiding muscle relaxants like cyclobenzaprine in older adults — they're poorly tolerated (drowsiness, confusion, falls) and the benefit is doubtful.",['beers']],
     ['opioid','caution',"The Beers Criteria advises avoiding opioids together with benzodiazepines or gabapentin/pregabalin in older adults, and notes higher fall risk. Start-low dosing is common.",['beers']],
     ['benzodiazepine','caution',"The Beers Criteria advises avoiding benzodiazepines in older adults when possible — they raise the risk of falls, fractures, confusion, and car accidents.",['beers']],
     ['first-gen-antihistamine','caution',"The AGS Beers Criteria lists diphenhydramine and similar antihistamines as best avoided in older adults (confusion, falls, constipation).",['beers']],
@@ -1486,6 +1503,7 @@ const USES = {
   fentanyl:{rx:['Severe chronic pain in people already used to opioids']},
   benzodiazepine:{rx:['Anxiety and panic disorder','Seizures (some)','Short-term insomnia (some)','Alcohol withdrawal (some)']},
   naloxone:{rx:['Emergency reversal of an opioid overdose']},
+  cyclobenzaprine:{rx:['Short-term relief of muscle spasms from strains and sprains (with rest and physical therapy)']},
   tums:{rx:['Heartburn & acid indigestion','Calcium supplement']},
   diphenhydramine:{rx:['Allergies & hay fever','Occasional sleeplessness']},
   pde5:{rx:['Erectile dysfunction','Enlarged prostate / BPH (tadalafil)','Pulmonary arterial hypertension (Revatio, Adcirca)']},
